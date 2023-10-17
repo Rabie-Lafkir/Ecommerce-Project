@@ -18,6 +18,7 @@ const usersSchema = new mongoose.Schema({
     required: true,
     set: function (password) {
       // Hashing the password using md5 before saving it to the database
+      //Returning
       return md5(password);
     },
   },
