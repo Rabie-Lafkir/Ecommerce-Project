@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { v4: uuidv4 } = require("uuid");
-const md5 = require("md5");
+
 
 const usersSchema = new mongoose.Schema({
   id: {
@@ -13,14 +13,11 @@ const usersSchema = new mongoose.Schema({
   last_name: { type: String, required: true },
   email: { type: String, required: true },
   role: { type: String, required: true, default: 'admin' },
+  user_name: {type: String},
   password: {
     type: String,
     required: true,
-    set: function (password) {
-      // Hashing the password using md5 before saving it to the database
-      //Returning
-      return md5(password);
-    },
+    
   },
   creation_date: { type: Date, default: Date.now },
   last_login: { type: Date, default: null },
