@@ -1,14 +1,15 @@
 const mongoose = require('mongoose');
 
 const categoriesSchema = new mongoose.Schema({
-    id: {
+    // id: {
+    //     type: String,
+    //     required: true,
+    //     unique: true
+    // },
+    category_name: {
         type: String,
         required: true,
         unique: true
-    },
-    category_name: {
-        type: String,
-        required: true
     },
     active: {
         type: Boolean,
@@ -16,5 +17,6 @@ const categoriesSchema = new mongoose.Schema({
     }
 }, 
 { timestamps: true });
-//Exporting the module
+
+
 module.exports = mongoose.model("Categories", categoriesSchema);

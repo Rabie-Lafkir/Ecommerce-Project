@@ -2,27 +2,31 @@ const mongoose = require('mongoose');
 
 const  subcategories= new mongoose.Schema({
     
-    id:{
-        type :String ,
-        required :true,
-        unique: true,
-        description: 'Subcategory ID'
-    },
+    // id:{
+    //     type :String ,
+    //    // required :true,
+    //     unique: true,
+    //     description: 'Subcategory ID'
+    // },
 
     subcategory_name:{
         type : String ,
         required: true,
+        unique:true,
         description: ' Subcategory name',
     },
     category_id:{
         type: String,
         description: ' The related category id',
-        ref:'categories',
-       // type: mongoose.Schema.Types.ObjectId,
+        ref:'Categories',
+       type: mongoose.Schema.Types.ObjectId
+      
     },
     active:{
         type: Boolean,
-        description: 'Subcategory active status'
+        default:false,
+        description: 'Subcategory active status',
+
     }
 }, 
     
