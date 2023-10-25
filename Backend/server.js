@@ -1,26 +1,24 @@
+require('dotenv').config();
+const connectDb = require('./config/dbConnection')
+const bodyParser = require('body-parser') 
 const express = require('express');
-const dotenv = require('dotenv').config();
-const connectDb = require('./Config/dbConnection');
 const app = express();
-
-
-connectDb()
-
-const PORT = process.env.PORT || 5000;
-
-const Categories = require('./Models/Categories');
-const Subcategories= require('./Models/Subcategories');
+//const Categories = require('./Models/Categories');
+//const Subcategories= require('./Models/Subcategories');
 
 
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
+const PORT = process.env.PORT || 4000
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended:true}))
+//User Routes
+app.use('/users',require('./Routes/usersRoute'));
+//Categories and subcategories Routes
 app.use('/api/categories', require('./Routes/CategoriesRoute'));
 app.use('/api/subcategories', require('./Routes/SubcategoriesRoutes'));
 
 
-
 app.listen(PORT,()=>{
-    console.log(`running on the port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`)
+    connectDb();
 })
