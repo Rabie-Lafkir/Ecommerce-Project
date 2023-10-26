@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const validateToken = require('../Middlewares/authMiddleware')
 
 const {
     createCategory,

@@ -16,6 +16,9 @@ app.use('/users',require('./Routes/usersRoute'));
 //Categories and subcategories Routes
 app.use('/api/categories', require('./Routes/CategoriesRoute'));
 app.use('/api/subcategories', require('./Routes/SubcategoriesRoutes'));
+//Products and orders Routes
+app.use('/v1/products',require('./Routes/productRoutes'))
+app.use('/v1/orders',require('./Routes/orderRoutes'))
 
 
 app.listen(PORT,()=>{

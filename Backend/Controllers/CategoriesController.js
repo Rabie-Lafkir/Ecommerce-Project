@@ -1,5 +1,6 @@
 const Category = require("../Models/Categories");
 const Subcategory = require("../Models/Subcategories");
+const user = require('../Models/Users')
 
 const createCategory = async (req, res) => {
   const { category_name } = req.body;

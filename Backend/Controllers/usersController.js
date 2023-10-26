@@ -9,7 +9,7 @@ const generatePassword = require("generate-password");
 const passwordOptions = {
   length: 12,
   numbers: true,
-  symbols: true,
+  symbols: false,
   uppercase: true,
   excludeSimilarCharacters: true,
 };
@@ -51,9 +51,9 @@ const userRegister = async (req, res) => {
   const savedPassword = password;
 
   const validationResult = validateUserInput(req, res);
-  if (firstName || lastName || email || userName) {
-    res.status(400).json({ message: "All fields are required" });
-  }
+  // if (firstName || lastName || email || userName) {
+  //   res.status(400).json({ message: "All fields are required" });
+  // }
   if (validationResult) {
     res.status(400).json(validationResult);
   }

@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../Controllers/usersController')
-const authToken = require('../Middlewares/authMiddleware');
-const validateToken = require('../Middlewares/authMiddleware');
+
+const authMiddleware = require('../Middlewares/authMiddleware');
 const usersController = require('../Controllers/usersController');
 
 router.post('/',userController.userRegister);
@@ -19,7 +19,7 @@ router.get('/', (req, res) => {
     }
   });
 
-router.get('/:id(\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12})',validateToken,userController.getUserById);
+router.get('/:id(\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12})',authMiddleware.validateToken,userController.getUserById);
 router.put('/:id(\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12})',usersController.updateUser);
 router.delete('/:id(\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12})',usersController.deleteUser);
 
