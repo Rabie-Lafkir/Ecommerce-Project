@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { v4: uuidv4 } = require("uuid");
-const md5 = require("md5");
+
 
 const customersSchema = mongoose.Schema({
     id: {
@@ -15,11 +15,7 @@ const customersSchema = mongoose.Schema({
       role: { type: String, required: true, default: 'admin' },
       password: {
         type: String,
-        required: true,
-        set: function (password) {
-          // Hashing the password using md5 before saving it to the database
-          return md5(password);
-        },
+        required: true
       },
       creation_date: { type: Date, default: Date.now },
       last_login: { type: Date, default: null },
@@ -28,4 +24,4 @@ const customersSchema = mongoose.Schema({
 })
 
 const Customers = mongoose.model("Customers", customersSchema);
-module.exports = Customers;
+module.exports=Customers;
