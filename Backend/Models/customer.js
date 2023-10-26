@@ -1,22 +1,27 @@
 const mongoose = require('mongoose');
+const { v4: uuidv4 } = require("uuid");
 
-const customerSchema = new mongoose.Schema({
-    firstName: {
-        type: String,
-        required: true,
-    },
-    lastName: {
-        type: String,
-        required: true,
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-    },
-    // Add other fields as needed (e.g., address, phone number, etc.)
-});
 
-const Customer = mongoose.model('Customer', customerSchema);
+const customersSchema = mongoose.Schema({
+    id: {
+        type: String,
+        default: uuidv4, 
+        unique: true, 
+        required: true, 
+      },
+      first_name: { type: String, required: true },
+      last_name: { type: String, required: true },
+      email: { type: String, required: true },
+      role: { type: String, required: true, default: 'admin' },
+      password: {
+        type: String,
+        required: true
+      },
+      creation_date: { type: Date, default: Date.now },
+      last_login: { type: Date, default: null },
+      active: { type: Boolean, default: false }
+    
+})
 
-module.exports = Customer; // Export Customer directly
+const Customers = mongoose.model("Customers", customersSchema);
+module.exports=Customers;
