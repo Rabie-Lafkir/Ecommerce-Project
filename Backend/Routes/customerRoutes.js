@@ -3,14 +3,14 @@ const router =express.Router()
 const customerController=require('../Controllers/customerController')
 
 //Router creat costumer
-router.post('/customers',customerController.createCustomer)
+router.post('/',customerController.createCustomer)
 //Authentication 
-router.post('/customers/login',customerController.customerLogin)
+router.post('/login',customerController.customerLogin)
 //getAllcustomer
 //router.get('/customers',customerController.getAllCustomers)
 //search for customer
 //router.get('/customers/search',customerController.searchCustomer) 
-router.get('/customers', (req, res, next) => {
+router.get('/', (req, res, next) => {
     if (Object.keys(req.query).length > 0) {
         customerController.searchCustomer(req, res, next);  
     }
@@ -19,10 +19,10 @@ router.get('/customers', (req, res, next) => {
     } 
 });
 //get customerbyid
-router.get('/customers/:id',customerController.getCustomer)
+router.get('/:id',customerController.getCustomer)
 //update Customer updateCustomer
-router.put('/customers/:id',customerController.updateCustomer),
+router.put('/:id',customerController.updateCustomer),
 //delete customer 
-router.delete('/customers/:id',customerController.deleteCustomer),
+router.delete('/:id',customerController.deleteCustomer),
 
 module.exports=router;

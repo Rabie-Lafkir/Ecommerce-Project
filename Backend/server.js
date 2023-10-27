@@ -3,8 +3,7 @@ const connectDb = require('./config/dbConnection')
 const bodyParser = require('body-parser') 
 const express = require('express');
 const app = express();
-//const Categories = require('./Models/Categories');
-//const Subcategories= require('./Models/Subcategories');
+
 
 
 
@@ -12,10 +11,12 @@ const PORT = process.env.PORT || 4000
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}))
 //User Routes
-app.use('/users',require('./Routes/usersRoute'));
+app.use('/v1/users',require('./Routes/usersRoute'));
+//Customer Routes
+app.use('/v1/customers',require('./Routes/customerRoutes'));
 //Categories and subcategories Routes
-app.use('/api/categories', require('./Routes/CategoriesRoute'));
-app.use('/api/subcategories', require('./Routes/SubcategoriesRoutes'));
+app.use('/v1/categories', require('./Routes/CategoriesRoute'));
+app.use('/v1/subcategories', require('./Routes/SubcategoriesRoutes'));
 //Products and orders Routes
 app.use('/v1/products',require('./Routes/productRoutes'))
 app.use('/v1/orders',require('./Routes/orderRoutes'))
