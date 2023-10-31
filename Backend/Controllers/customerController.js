@@ -77,6 +77,10 @@ const customerLogin = async (req, res) => {
       res.status(401).json({ error: "Unauthorized" });
     }
 
+    if(!newCustomer.active){
+      res.status(401).json({ error: "Unauthorized" });
+    }
+
     // Compare hashed passwords using bcrypt.compare
     const passwordMatch = await bcrypt.compare(password, newCustomer.password);
     if (!passwordMatch) {

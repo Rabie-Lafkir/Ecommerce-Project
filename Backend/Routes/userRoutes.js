@@ -5,9 +5,9 @@ const userController = require('../Controllers/userController')
 const authMiddleware = require('../Middlewares/authMiddleware');
 const usersController = require('../Controllers/userController');
 
-router.post('/',userController.userRegister);
+router.post('/',authMiddleware.checkAdminRole,userController.userRegister);
 router.post('/login',userController.userLogin);
-router.get('/', (req, res) => {
+router.get('/',authMiddleware.checkAdminRole ,(req, res) => {
     const { query } = req.query;
 
     if (query) {
@@ -19,9 +19,9 @@ router.get('/', (req, res) => {
     }
   });
 
-router.get('/:id(\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12})',authMiddleware.validateToken,userController.getUserById);
-router.put('/:id(\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12})',usersController.updateUser);
-router.delete('/:id(\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12})',usersController.deleteUser);
+router.get('/:id',authMiddleware.checkAdminRole,userController.getUserById);
+router.put('/:id',authMiddleware.checkAdminRole,usersController.updateUser);
+router.delete('/:id',authMiddleware.checkAdminRole,usersController.deleteUser);
 
 
 
