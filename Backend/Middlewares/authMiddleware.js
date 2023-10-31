@@ -26,21 +26,38 @@ const validateToken = asyncHandler(async (req, res, next) => {
   }
 });
 
-// Middleware for authenticating the user
-function authenticateUser(req, res, next) {
-  const token = req.headers.authorization;
-  // Your authentication logic here
-  next();
-}
+// Checking the admin role
+const checkAdminRole = asyncHandler(async (req, res, next) => {
+  let token;
+  let authHeader = req.headers.Authorization || req.headers.authorization;
+  
+  if (authHeader && authHeader.startsWith('Bearer')) {
+    token = authHeader.split(' ')[1];
+    
+    if (!token) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
 
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+      if (err) {
+        res.status(403).json({
+          "status": 403,
+          "message": "you don't have enough privilege"
+        });
+      } 
 
-
-// Middleware for authenticating the customer
-function authenticateCustomer(req, res, next) {
-  const token = req.headers.authorization;
-  // Your authentication logic here
-  next();
-}
+      if(decoded && decoded.user.role){
+        next();
+      }
+    });
+  } else {
+    res.status(403).json({
+      "status": 403,
+      "message": "you don't have enough privilege"
+    });
+  }
+});
 
 // Middleware to check if the user has the necessary privilege to create an order
 const checkOrderPrivilege = (req, res, next) => {
@@ -80,8 +97,7 @@ const checkGetOrderByIdPrivilege = (req, res, next) => {
 
 module.exports = {
   validateToken,
-  authenticateUser,
-  authenticateCustomer,
+  checkAdminRole,
   checkOrderPrivilege,
   checkListOrdersPrivilege,
   checkGetOrderByIdPrivilege,

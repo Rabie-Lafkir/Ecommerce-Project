@@ -1,5 +1,5 @@
-const Subcategory = require("../Models/Subcategories");
-const Category = require("../Models/Categories");
+const Subcategory = require("../Models/subcategorie");
+const Category = require("../Models/categorie");
 //const Product = require('../Models/Product');
 
 // Creating a new subcategry

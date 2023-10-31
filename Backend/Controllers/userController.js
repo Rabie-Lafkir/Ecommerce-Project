@@ -1,8 +1,7 @@
-const User = require("../Models/Users");
+const User = require("../Models/user");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const bcrypt = require("bcrypt");
-const { v4: uuidv4 } = require("uuid");
 const { sendNotificationEmail } = require("../Middlewares/emailSender");
 const validateUserInput = require("../Middlewares/verificationMiddleware");
 const generatePassword = require("generate-password");
@@ -51,9 +50,9 @@ const userRegister = async (req, res) => {
   const savedPassword = password;
 
   const validationResult = validateUserInput(req, res);
-  // if (firstName || lastName || email || userName) {
-  //   res.status(400).json({ message: "All fields are required" });
-  // }
+  if (!firstName || !lastName || !email || !userName) {
+    res.status(400).json({ message: "All fields are required" });
+  }
   if (validationResult) {
     res.status(400).json(validationResult);
   }
@@ -65,11 +64,9 @@ const userRegister = async (req, res) => {
     });
 
     if (existingUser) {
-      // User already exists, return a 400 Bad Request response
       return res.status(400).json({ error: "User already exists" });
     }
 
-    // User doesn't exist, proceed with registration
     bcrypt.genSalt(10, (err, salt) => {
       if (err) {
         console.log(err);
@@ -81,7 +78,6 @@ const userRegister = async (req, res) => {
             res.status(500).json({ error: "Registration failed" });
           } else {
             const newUser = await User.create({
-              id: uuidv4(),
               first_name: firstName,
               last_name: lastName,
               email: email,
@@ -91,7 +87,10 @@ const userRegister = async (req, res) => {
             });
             console.log(newUser);
             await sendNotificationEmail(newUser, savedPassword);
-            res.status(201).json({ message: "User registered successfully" });
+            res.status(201).json({
+              "status": 201,
+              "message": "user created successfully"
+            });
           }
         });
       }
@@ -106,18 +105,22 @@ const userRegister = async (req, res) => {
 const userLogin = async (req, res) => {
   const { userName, password } = req.body;
   try {
-    // Searching for the user in the database
     const user = await User.findOne({ user_name: userName });
-    //.select('-password');
 
     if (!user) {
-      res.status(401).json({ error: "Unauthorized" });
+      res.status(401).json({
+        "status": 401,
+        "message": "invalid credentials"
+      });
     }
 
     // Compare hashed passwords using bcrypt.compare
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
-      res.status(401).json({ error: "Wrong password!" });
+      res.status(401).json({
+        "status": 401,
+        "message": "invalid credentials"
+      });
     }
 
     // Update the last_login field with the current date and time

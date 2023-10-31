@@ -7,7 +7,7 @@ const {
     updateSubcategory,
     deleteSubcategory
  
-}= require('../Controllers/SubcategoriesControllers');
+}= require('../Controllers/subcategorieController');
 
 
 

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { Product } = require('../models/products');
+const { Product } = require('../Models/product');
 const ObjectId = mongoose.Types.ObjectId;
 
 // Create a new product

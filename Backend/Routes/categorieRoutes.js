@@ -9,7 +9,7 @@ const {
     updateCategory,
     deleteCategory ,
     searchForCategories 
-}= require('../Controllers/CategoriesController');
+}= require('../Controllers/categorieController');
 
 router.route('/').post(createCategory)
     .get((req,res,next) =>{
