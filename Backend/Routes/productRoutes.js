@@ -1,35 +1,24 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const router = express.Router();
-const {
-  createProduct,
-  listProducts,
-  updateProduct,
-  deleteProduct,
-  searchProducts,
-  getProductById,
-} = require('../Controllers/productController');
-const { authenticateUser } = require('../Middlewares/authMiddleware'); // Adjust the path based on your project structure
-
-
+const productController = require('../Controllers/productController');
+const { authenticateUser } = require('../Middlewares/authMiddleware');
 
 // Create a new product
-router.post('/', createProduct);
+router.post('/', authenticateUser, productController.createProduct);
 
 // List all the products
-router.get('/', listProducts);
+router.get('/', authenticateUser, productController.listProducts);
 
-// Search for a product 
-router.get('/search', searchProducts);
+// Search for a product
+router.get('/search', authenticateUser, productController.searchProducts);
 
 // Get a product by ID
-router.get('/:id', getProductById);
+router.get('/:id', authenticateUser, productController.getProductById);
 
 // Update product data by ID
-router.patch('/:id', updateProduct);
+router.patch('/:id', authenticateUser, productController.updateProduct);
 
 // Delete a product by ID
-router.delete('/:id', deleteProduct);
+router.delete('/:id', authenticateUser, productController.deleteProduct);
 
 module.exports = router;
-
