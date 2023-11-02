@@ -1,24 +1,24 @@
 const express = require('express');
 const router = express.Router();
 const productController = require('../Controllers/productController');
-const { authenticateUser } = require('../Middlewares/authMiddleware');
+const { validateToken } = require('../Middlewares/authMiddleware');
 
 // Create a new product
-router.post('/', authenticateUser, productController.createProduct);
+router.post('/', validateToken, productController.createProduct);
 
 // List all the products
-router.get('/', authenticateUser, productController.listProducts);
+router.get('/', validateToken, productController.listProducts);
 
 // Search for a product
-router.get('/search', authenticateUser, productController.searchProducts);
+router.get('/search', validateToken, productController.searchProducts);
 
 // Get a product by ID
-router.get('/:id', authenticateUser, productController.getProductById);
+router.get('/:id', validateToken, productController.getProductById);
 
 // Update product data by ID
-router.patch('/:id', authenticateUser, productController.updateProduct);
+router.patch('/:id', validateToken, productController.updateProduct);
 
 // Delete a product by ID
-router.delete('/:id', authenticateUser, productController.deleteProduct);
+router.delete('/:id', validateToken, productController.deleteProduct);
 
 module.exports = router;
