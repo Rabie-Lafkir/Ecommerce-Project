@@ -77,14 +77,14 @@ const userRegister = async (req, res) => {
             console.log(err);
             res.status(500).json({ error: "Registration failed" });
           } else {
-            const newUser = await User.create({
-              first_name: firstName,
-              last_name: lastName,
-              email: email,
-              role: role,
-              user_name: userName,
-              password: hash,
-            });
+              const newUser = await User.create({
+                first_name: firstName,
+                last_name: lastName,
+                email: email,
+                role: role,
+                user_name: userName,
+                password: hash,
+              });
             console.log(newUser);
             await sendNotificationEmail(newUser, savedPassword);
             res.status(201).json({
@@ -110,8 +110,9 @@ const userLogin = async (req, res) => {
     if (!user) {
       res.status(401).json({
         "status": 401,
-        "message": "invalid credentials"
+        "message": "User does not exist"
       });
+      
     }
 
     // Compare hashed passwords using bcrypt.compare
@@ -148,7 +149,7 @@ const userLogin = async (req, res) => {
 //Get all the users list
 const getAllUsers = async (req, res) => {
   const { page, sort } = req.query;
-  const elementsPerPage = 4;
+  const elementsPerPage = 3;
   const sortOrder = sort === "DESC" ? -1 : "ASC" === 1;
   const skip = (page - 1) * elementsPerPage;
   const usersList = await User.find()
@@ -160,14 +161,13 @@ const getAllUsers = async (req, res) => {
 };
 
 //Get user by id
-const uuidv4Pattern =
-  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/;
+
 const getUserById = async (req, res) => {
   const id = req.params.id;
 
-  if (uuidv4Pattern.test(id)) {
+  
     try {
-      const user = await User.findOne({ id: id }).select("-password");
+      const user = await User.findOne({ _id: id }).select("-password");
 
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -180,10 +180,8 @@ const getUserById = async (req, res) => {
         .status(500)
         .json({ error: "An error occurred while fetching the user" });
     }
-  } else {
-    res.status(400).json({ message: "Invalid id" });
-  }
-};
+  } 
+
 
 const searchUser = async (req, res) => {
   try {
@@ -191,7 +189,7 @@ const searchUser = async (req, res) => {
 
     // Display settings
     const elementsPerPage = 4;
-    const sortOrder = sort === "DESC" ? -1 : 1; // Corrected the sort order values
+    const sortOrder = sort === "DESC" ? -1 : 1; 
     const skip = (page - 1) * elementsPerPage;
 
     // Finding all users that have an occurrence of the query in their usernames, first names, or last names
@@ -215,28 +213,21 @@ const searchUser = async (req, res) => {
 //Update a user by Id
 const updateUser = async (req, res) => {
   const id = req.params.id;
-  const { newFirstName, newLastName, newEmail, newRole, newIsActive } =
+  const { firstName, lastName, email, role, isActive } =
     req.body;
 
   try {
-    const updateFields = {}; // Create an object to store the fields to update
+    const updateFields = {
+      first_name: firstName,
+      last_name: lastName,
+      email: email,
+      role: role,
+      active: isActive
+    }; // Create an object to store the fields to update
 
-    // Fields that you want to update
-    const fieldsToUpdate = [
-      "first_name",
-      "last_name",
-      "email",
-      "role",
-      "active",
-    ];
+  
 
-    for (const field of fieldsToUpdate) {
-      if (req.body[field] !== undefined) {
-        updateFields[field] = req.body[field];
-      }
-    }
-
-    const userToUpdate = await User.findOneAndUpdate({ id: id }, updateFields);
+    const userToUpdate = await User.findOneAndUpdate({ _id: id }, updateFields);
     // Handle the case where the user with the specified ID was not found.
     if (!userToUpdate) {
       return res.status(404).json({ message: "User not found." });
@@ -255,7 +246,7 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
   try {
     const id = req.params.id;
-    const userToDelete = await User.findOneAndDelete({ id: id });
+    const userToDelete = await User.findOneAndDelete({ _id: id });
     if (!userToDelete) {
       return res.status(404).json({ message: "User not found." });
     }

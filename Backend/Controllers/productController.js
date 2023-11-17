@@ -21,66 +21,78 @@ const createProduct = async (req, res) => {
 
         const newProduct = new Product({
             sku: sku,
-            productImage: productImage,
-            productName: productName,
-            subcategoryID: subcategoryID,
-            shortDescription: shortDescription,
-            longDescription,
-            price,
-            quantity,
-            discountPrice,
-            options,
+            product_image: productImage,
+            product_name: productName,
+            subcategory_id: subcategoryID,
+            short_description: shortDescription,
+            long_description: longDescription,
+            price: price,
+            quantity: quantity,
+            discount_price: discountPrice,
+            options: options,
         });
 
         await newProduct.save();
 
-        res.status(201).json({ status: 201, message: 'Product created successfully' });
+        res.status(201).json({ status: 201, message: 'Product created successfully', newProduct });
     } catch (error) {
         res.status(500).json({ status: 500, error: error.message });
     }
 };
 
-// List all the products
-const listProducts = async (req, res) => {
+
+
+const listProducts = async (req, res, next) => {
     try {
-        const page = parseInt(req.query.page) || 1;
-        const perPage = 10;
+      const page = req.query.page || 1;
+      const limit = 2;
+      const skip = (page - 1) * limit;
+      const product = await Product.aggregate([
+        {
+          $lookup: {
+            from: "subcategories",
+            localField: "subcategory_id",
+            foreignField: "_id",
+            as: "subcategory",
+          },
+        },
+        {
+          $skip: skip,
+        },
+        {
+          $limit: limit,
+        },
+        {
+          $project: {
+            _id: 1,
+            sku: 1,
+            product_image: 1,
+            product_name: 1,
+            categoryName: "$subcategory.subcategory_name",
+            short_description: 1,
+            price: 1,
+            discount_price: 1,
+            options: 1,
+            active: 1,
+          },
+        },
+      ]);
+  
+      res.status(200).json(product);
+    } catch (err) {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    }}
 
-        const products = await Product.aggregate([
-            {
-                $project: {
-                    _id: 1,
-                    sku: 1,
-                    productImage: 1,
-                    productName: 1,
-                    categoryName: '$categoryName', // Modify this to match your schema structure
-                    shortDescription: 1,
-                    price: 1,
-                    quantity: 1,
-                    discountPrice: 1,
-                    active: 1,
-                },
-            },
-            {
-                $skip: (page - 1) * perPage,
-            },
-            {
-                $limit: perPage,
-            },
-        ]);
-
-        res.status(200).json({ status: 200, data: products });
-    } catch (error) {
-        res.status(500).json({ status: 500, error: error.message });
-    }
-};
 
 // Search for a product
 const searchProducts = async (req, res) => {
     try {
         const query = req.query.query;
         const page = parseInt(req.query.page) || 1;
-        const perPage = 10;
+        const perPage = 1;
 
         const products = await Product.aggregate([
             {

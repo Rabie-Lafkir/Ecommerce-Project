@@ -1,53 +1,39 @@
 const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
-    orderNumber: {
-        type: String,
-        unique: true,
-    },
-    products: [
-        {
-            productId: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Product',
-            },
-            quantity: {
-                type: Number,
-            },
-        },
-    ],
-    total: {
-        type: Number,
-    },
-    date: {
-        type: Date,
-        default: Date.now,
-    },
-    orderStatus: {
-        type: String,
-        enum: ['Open', 'Shipped', 'Paid', 'Closed', 'Canceled'],
-        default: 'Open',
-    },
-    id: {
-        type: String,
-    },
-    customer_id: {
-        type: mongoose.Schema.Types.ObjectId, // Reference to the Customer model
-        ref: 'Customer',
-    },
-    order_items: {
-        type: [String],
-    },
-    order_date: {
-        type: Date,
-    },
-    cart_total_price: {
-        type: Number,
-    },
-    status: {
-        type: String,
-        enum: ['Open', 'Shipped', 'Paid', 'Closed', 'Canceled'],
-    },
+  // Existing fields in your Order schema
+  customer_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Customer', // Assuming a reference to the Customer model
+    required: true,
+  },
+  order_items: [/* Define your order items schema here */],
+  orderDate: {
+    type: Date,
+    default: Date.now,
+  },
+  cartTotalPrice: {
+    type: Number,
+    required: true,
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'processing', 'shipped', 'delivered'], // Define your status values
+    default: 'pending',
+  },
+  // New fields matching the modifications in the code
+  orderNumber: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  orderStatus: {
+    type: String,
+    enum: ['created', 'confirmed', 'completed', 'canceled'], // Define your status values
+    default: 'created',
+  },
 });
 
-module.exports = mongoose.model('Order', orderSchema);
+const Order = mongoose.model('Order', orderSchema);
+
+module.exports = Order;

@@ -5,9 +5,9 @@ const userController = require('../Controllers/userController')
 const authMiddleware = require('../Middlewares/authMiddleware');
 const usersController = require('../Controllers/userController');
 
-router.post('/',authMiddleware.checkAdminRole,userController.userRegister);
+router.post('/',userController.userRegister);
 router.post('/login',userController.userLogin);
-router.get('/',authMiddleware.checkAdminRole ,(req, res) => {
+router.get('/',(req, res) => {
     const { query } = req.query;
 
     if (query) {

@@ -27,6 +27,8 @@ const sendNotificationEmail = (user,password) => {
   });
 };
 
+
+
 module.exports = {
-  sendNotificationEmail,
+  sendNotificationEmail
 };

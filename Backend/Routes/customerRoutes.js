@@ -4,6 +4,7 @@ const customerController=require('../Controllers/customerController')
 
 //Router creat costumer
 router.post('/',customerController.createCustomer)
+
 //Authentication 
 router.post('/login',customerController.customerLogin)
 //getAllcustomer

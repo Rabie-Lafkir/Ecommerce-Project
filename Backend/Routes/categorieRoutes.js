@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const validateToken = require('../Middlewares/authMiddleware')
+const authMiddleware = require('../Middlewares/authMiddleware')
 
 const {
     createCategory,
@@ -11,7 +11,7 @@ const {
     searchForCategories 
 }= require('../Controllers/categorieController');
 
-router.route('/').post(createCategory)
+router.route('/').post(authMiddleware.checkAdminRole,createCategory)
     .get((req,res,next) =>{
         if (Object.keys(req.query).length > 0) {
             return searchForCategories(req, res, next);  

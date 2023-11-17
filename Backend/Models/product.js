@@ -1,20 +1,6 @@
 const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
-    name: {
-        type: String,
-       // required: true,
-        trim: true,
-    },
-    category: {
-        type: String,
-        enum: ['Electronics'], // If there's only one allowed category
-        //required: true,
-    },
-    id: {
-        type: String,
-        //required: true,
-    },
     sku: {
         type: String,
         //required: true,
@@ -28,9 +14,9 @@ const productSchema = new mongoose.Schema({
         //required: true,
     },
     subcategory_id: {
-        type: String,
-        //required: true,
-    },
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Subcategories",
+      },
     short_description: {
         type: String, // Corrected from "text"
         //required: true,

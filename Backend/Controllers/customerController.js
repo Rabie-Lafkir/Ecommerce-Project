@@ -2,12 +2,35 @@ const customer = require("../Models/customer");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const mongoose=require("mongoose")
-
 require("dotenv").config();
+
+
+// Generate Token and Refresh Token
+const generateToken = (customer) => {
+  console.log(customer) 
+  return jwt.sign(
+    { customer },
+    process.env.ACCESS_TOKEN_SECRET,
+    {
+      expiresIn: "1h",
+    }
+  );
+};
+
+const generateRefreshToken = (customer, expiresIn) => {
+  return jwt.sign({ customer }, process.env.REFRESH_TOKEN_SECRET, {
+    expiresIn,
+  });
+};
 
 //post creat costumer
 const createCustomer = async (req, res) => {
   const { first_name, last_name, email, password } = req.body;
+  const emailRegex = /^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/;
+  if (!emailRegex.test(email)) {
+    res.status(400).json({ error: "Invalid email format" });
+    return;
+  }
   console.log(req.body);
 
   try {
@@ -29,85 +52,59 @@ const createCustomer = async (req, res) => {
 };
 
 
-//authenticateCustomer
-/*const authenticateCustomer = (req, res, next) => {
-  const { email, password } = req.body;
 
-  customer.findOne({ email }, (err, user) => {
-    if (err || !user) {
-      return res.status(401).json({
-        status: 401,
-        message: "Invalid credentials",
-      });
-    }
-
-    const matchPassword = bcrypt.compareSync(password, customer.password);
-
-    if (matchPassword) {
-      const token=customer.generateAuthToken();
-
-      const refreshToken = jwt.sign(
-        {id: this.__id},
-        process.env.refreshKey,
-        { expiresIn: "1h" }
-      );
-
-      res.status(200).json({
-        access_token: token,
-        token_type: "jwt",
-        expires_in: "1h",
-        refresh_token: refreshToken
-      });
-    } else {
-      return res.status(401).json({
-        status: 401,
-        message: "Invalid credentials",
-      });
-    }
-  });
-};*/
 const customerLogin = async (req, res) => {
   const { email, password } = req.body;
-  try {
-    // Searching for the user in the database
-    const newCustomer = await customer.findOne({ email: email });
-    //.select('-password');
 
-    if (!newCustomer) {
-      res.status(401).json({ error: "Unauthorized" });
+  try {
+    // Validate request parameters
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password are required fields." });
     }
 
-    if(!newCustomer.active){
-      res.status(401).json({ error: "Unauthorized" });
+    const existingCustomer = await customer.findOne({ email: email });
+
+    if (!existingCustomer) {
+      return res.status(401).json({
+        status: 401,
+        message: "customer does not exist"
+      });
     }
 
     // Compare hashed passwords using bcrypt.compare
-    const passwordMatch = await bcrypt.compare(password, newCustomer.password);
+    const passwordMatch = await bcrypt.compare(password, existingCustomer.password);
     if (!passwordMatch) {
-      res.status(401).json({ error: "Unauthorized" });
+      return res.status(401).json({
+        status: 401,
+        message: "Invalid credentials"
+      });
     }
 
     // Update the last_login field with the current date and time
-    newCustomer.last_login = new Date();
-    await newCustomer.save();
+    existingCustomer.last_login = new Date();
+    await existingCustomer.save();
 
-    /* Generate a JWT token
-      const accessToken = jwt.sign({ customer }, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: "2h",
-      });
-  
-      // Calculate the time left until the token expires
-      const now = Math.floor(Date.now() / 1000); // Current time in seconds
-      const tokenExpiration = Math.floor(jwt.decode(accessToken).exp); // Token expiration time
-      const expires_in = tokenExpiration - now;*/
+    // Generate JWT tokens
+    const accessToken = generateToken(existingCustomer);
+    const refreshToken = generateRefreshToken(existingCustomer, '7d'); // Set refresh token expiration to 7 days
 
-    return res.json({ message: "loged seccusefuly" });
-
-    // Add other user-related information you want to include
+    res.status(200).json({
+      message: "Logged in successfully",
+      accessToken: accessToken,
+      tokenType: "Bearer",
+      expiresIn: "1h",
+      refreshToken: refreshToken
+    });
   } catch (error) {
-    res.status(500).json({ error: "Login failed" });
+    console.error(error); // Log the error for debugging purposes
+    res.status(500).json({ error: "Login failed. Please try again later." });
   }
 };
+
+module.exports = customerLogin;
+
+
+
 //get all customers
 const getAllCustomers = async (req, res) => {
   const page = parseInt(req.query.page) || 1; 

@@ -3,19 +3,15 @@ const connectDb = require('./config/dbConnection');
 const bodyParser = require('body-parser');
 const express = require('express');
 const app = express();
+const cors = require('cors');
 
 // Middleware to attach a sample user to the request for testing (replace with your authentication logic)
-app.use((req, res, next) => {
-    req.user = {
-        role: 'admin', // Sample user role for testing
-        // Add other user properties as needed
-    };
-    next();
-});
+
 
 const PORT = process.env.PORT || 4000;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors({origin:"*"}));
 
 // User Routes
 app.use('/v1/users', require('./Routes/userRoutes'));

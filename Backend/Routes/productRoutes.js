@@ -4,10 +4,10 @@ const productController = require('../Controllers/productController');
 const { validateToken } = require('../Middlewares/authMiddleware');
 
 // Create a new product
-router.post('/', validateToken, productController.createProduct);
+router.post('/',productController.createProduct);
 
 // List all the products
-router.get('/', validateToken, productController.listProducts);
+router.get('/', productController.listProducts);
 
 // Search for a product
 router.get('/search', validateToken, productController.searchProducts);

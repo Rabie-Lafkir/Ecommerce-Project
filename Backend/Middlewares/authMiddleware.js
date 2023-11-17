@@ -47,7 +47,7 @@ const checkAdminRole = asyncHandler(async (req, res, next) => {
         });
       } 
 
-      if(decoded && decoded.user.role){
+      if(decoded && decoded.user.role==='admin'){
         next();
       }
     });
