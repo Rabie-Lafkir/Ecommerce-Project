@@ -12,12 +12,13 @@ import logo from "../../assets/Logo.png";
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { useLogOut } from "../../hooks/useLogOut";
+import { useCart } from '../../context/CartContext';
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 export default function Navbar() {
-  
+  const { cartCount } = useCart();
   const { customer } = useContext(AuthContext);
   const isLoggedIn = !!customer;
   const logout = useLogOut()
@@ -149,14 +150,15 @@ const handleLogOut =async()=>{
           )}
                   <div className="">
                     <div className="lg:flex gap-1 justify-between">
-                      <button
-                        type="button"
-                        onClick={toggleCart}
-                        className="flex items-center justify-center relative rounded-full p-1 text-primary hover:text-secondary flex text-md md:text-2xl"
-                      >
-                        <LiaShoppingBagSolid />
-                        <span className="text-sm">(0)</span>
-                      </button>
+                    <button
+      type="button"
+      onClick={toggleCart}
+      className="flex items-center justify-center relative rounded-full p-1 text-primary hover:text-secondary flex text-md md:text-2xl"
+    >
+      <LiaShoppingBagSolid />
+      {/* Display the cartCount value */}
+      <span className="text-sm">({cartCount})</span>
+    </button>
                     </div>
                   </div>
                   {isLoggedIn === true ? (

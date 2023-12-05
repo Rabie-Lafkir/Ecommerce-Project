@@ -1,33 +1,58 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
-// Create a context for managing the cart state
 const CartContext = createContext();
 
-// Custom hook to use the cart context
 export const useCart = () => {
   return useContext(CartContext);
 };
 
-// CartProvider component to wrap the app and provide cart functionality
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
+  const [subtotal, setSubtotal] = useState(0);
+  let cartQuantity = 0;
 
-  // Function to add a product to the cart
   const addToCart = (product) => {
-    setCartItems((prevItems) => [...prevItems, product]);
+    const existingProductIndex = cartItems.findIndex((item) => item._id === product._id);
+
+    if (existingProductIndex !== -1) {
+      const updatedCart = [...cartItems];
+      updatedCart[existingProductIndex].quantity += 1;
+      setCartItems(updatedCart);
+    } else {
+      setCartItems((prevItems) => [...prevItems, { ...product, quantity: 1 }]);
+    }
+
+    cartQuantity += 1;
   };
 
-  // Function to remove a product from the cart
   const removeFromCart = (itemId) => {
-    console.log("Removing item with ID:", itemId); // Log the ID to check correctness
-    const updatedCart = cartItems.filter(item => item._id !== itemId);
-    console.log("Updated Cart Items:", updatedCart); // Log updated cart items to check removal
-    setCartItems(updatedCart);
+    const removedItem = cartItems.find((item) => item._id === itemId);
+
+    if (removedItem) {
+      cartQuantity -= removedItem.quantity;
+    }
+
+    setCartItems(cartItems.filter((item) => item._id !== itemId));
   };
-  
+
+  const calculateSubtotal = () => {
+    let total = 0;
+
+    for (const item of cartItems) {
+      total += item.price * item.quantity;
+    }
+
+    setSubtotal(total);
+  };
+
+  useEffect(() => {
+    calculateSubtotal();
+  }, [cartItems]);
+
+  const cartCount = cartItems.length;
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart }}>
+    <CartContext.Provider value={{ cartItems, cartQuantity, subtotal, addToCart, removeFromCart, cartCount }}>
       {children}
     </CartContext.Provider>
   );

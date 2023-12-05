@@ -30,7 +30,7 @@ const ProductsList = () => {
   return (
     <div className='w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 my-10 justify-center px-5 lg:px-44'>
       {products.map((product) => (
-        <Card key={product._id} className="mb-1 mt-5 shadow-sm bg-['#fcfcfc'] w-full sm:w-auto">
+        <Card key={product._id} className="mb-1 mt-5 p-5 shadow-sm bg-['#fcfcfc'] w-full sm:w-auto">
           <CardHeader shadow={false} floated={true} className='h-60 sm:h-auto'>
             <img
               src={product.product_image}
