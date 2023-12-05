@@ -1,0 +1,61 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Card,
+  CardHeader,
+  CardBody,
+  CardFooter,
+  Typography,
+  Button,
+} from '@material-tailwind/react';
+import { TbShoppingBagPlus } from 'react-icons/tb';
+
+const ProductsList = () => {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/v1/products');
+        const data = await response.json();
+        setProducts(data);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  return (
+    <div className='w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 justify-center px-5 lg:px-44'>
+      {products.map((product) => (
+        <Card key={product._id} className="mb-1 mt-5 shadow-sm bg-['#fcfcfc'] w-full sm:w-auto">
+          <CardHeader shadow={false} floated={true} className='h-60 sm:h-auto'>
+            <img
+              src={product.product_image}
+              alt='card-image'
+              className='h-full w-full object-cover'
+            />
+          </CardHeader>
+          <CardBody className='py-5'>
+            <div className='mb-2 flex items-start'>
+              <Typography color='blue-gray' className='font-medium'>
+                {product.product_name}
+              </Typography>
+            </div>
+          </CardBody>
+          <CardFooter className='pt-0 flex justify-between'>
+            <div color='dark blue' className='font-medium text-secondary'>
+              {product.price}
+            </div>
+            <button className='bg-stone-100 hover:bg-secondary hover:text-white text-2xl text-stone-800 flex items-center justify-center rounded-full px-3 py-3'>
+              <TbShoppingBagPlus />
+            </button>
+          </CardFooter>
+        </Card>
+      ))}
+    </div>
+  );
+};
+
+export default ProductsList;
