@@ -4,6 +4,12 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const app = express();
 const cors = require('cors');
+app.use(cors({origin:"*"}));
+// app.use(cors({
+//   origin: 'http://localhost:5173', // Replace with your frontend URL
+//   // Additional CORS options if needed
+// }));
+
 
 // Middleware to attach a sample user to the request for testing (replace with your authentication logic)
 
@@ -11,7 +17,7 @@ const cors = require('cors');
 const PORT = process.env.PORT || 4000;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors({origin:"*"}));
+
 
 // User Routes
 app.use('/v1/users', require('./Routes/userRoutes'));

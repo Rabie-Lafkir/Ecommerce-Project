@@ -1,11 +1,17 @@
 import React from 'react'
-
-const Settings = () => {
+import SideBar from '../../components/Sidebar/Sidebar';
+import Navbar from '../../components/Navbar/Navbar';
+import './Setting.css';
+const Setting = () => {
   return (
-    <div>
-      
+    <div className="setting">
+      <SideBar />
+      <div className="settingContainer">
+        <Navbar />
+     
+      </div>
     </div>
   )
 }
 
-export default Settings
+export default Setting;

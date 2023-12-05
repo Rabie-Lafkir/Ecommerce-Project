@@ -2,15 +2,12 @@ const express=require('express')
 const router =express.Router()
 const customerController=require('../Controllers/customerController')
 
+
+router.get("/totalcustomers", customerController.getTotalCustomers);
 //Router creat costumer
 router.post('/',customerController.createCustomer)
-
 //Authentication 
 router.post('/login',customerController.customerLogin)
-//getAllcustomer
-//router.get('/customers',customerController.getAllCustomers)
-//search for customer
-//router.get('/customers/search',customerController.searchCustomer) 
 router.get('/', (req, res, next) => {
     if (Object.keys(req.query).length > 0) {
         customerController.searchCustomer(req, res, next);  
@@ -19,6 +16,7 @@ router.get('/', (req, res, next) => {
         customerController.getAllCustomers(req, res, next); 
     } 
 });
+router.get('/activate/:activationToken', customerController.activateAccount);
 //get customerbyid
 router.get('/:id',customerController.getCustomer)
 //update Customer updateCustomer

@@ -44,6 +44,7 @@ export const Input = styled.input`
   :hover {
     box-shadow: 0 0 3px rgba(0, 0, 0, 0.15), 0 1px 5px rgba(0, 0, 0, 0.1);
   }
+
 `;
 
 export const Button = styled.button`

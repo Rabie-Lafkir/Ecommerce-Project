@@ -2,106 +2,158 @@ const customer = require("../Models/customer");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const mongoose=require("mongoose")
+const { sendActivationEmail } = require("../Middlewares/emailSender");
+ 
 require("dotenv").config();
+
+
+
 
 
 // Generate Token and Refresh Token
 const generateToken = (customer) => {
-  console.log(customer) 
+  const { _id, first_name, last_name, email } = customer;
+  const payload = {
+    _id,
+    first_name,
+    last_name,
+    email,
+  };
+
   return jwt.sign(
-    { customer },
+    { payload },
     process.env.ACCESS_TOKEN_SECRET,
     {
-      expiresIn: "1h",
+      expiresIn: '1h',
     }
   );
 };
 
 const generateRefreshToken = (customer, expiresIn) => {
-  return jwt.sign({ customer }, process.env.REFRESH_TOKEN_SECRET, {
+  const { _id, first_name, last_name, email } = customer;
+  const payload = {
+    _id,
+    first_name,
+    last_name,
+    email,
+  };
+
+  return jwt.sign({ payload }, process.env.REFRESH_TOKEN_SECRET, {
     expiresIn,
   });
 };
 
+const generateActivationToken = () => {
+  return Math.random().toString(36).substring(7);
+};
 //post creat costumer
 const createCustomer = async (req, res) => {
   const { first_name, last_name, email, password } = req.body;
   const emailRegex = /^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/;
+
   if (!emailRegex.test(email)) {
     res.status(400).json({ error: "Invalid email format" });
     return;
   }
-  console.log(req.body);
 
   try {
-    const hashPassword = await bcrypt.hash(password, 10); // Second argument is the number of salt rounds
+    // Check if a customer with the provided email already exists
+    const existingCustomer = await customer.findOne({ email });
+    if (existingCustomer) {
+      res.status(400).json({ error: "Email already exists" });
+      return;
+    }
+
+    const hashPassword = await bcrypt.hash(password, 10);
+    const activationToken = generateActivationToken();
 
     const newCustomer = new customer({
       first_name,
       last_name,
       email,
-      password: hashPassword
+      password: hashPassword,
+      activationToken
     });
 
     await newCustomer.save();
+    await sendActivationEmail(email, activationToken);
 
-    res.status(201).json({ message: "Customer registered successfully" });
+    res.status(201).json({ message: "Check your email for activation instructions" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
 
+const activateAccount = async (req, res) => {
+  const activationToken = req.params.activationToken;
+
+  try {
+    const activateCustomer = await customer.findOne({ activationToken });
+
+    if (!customer) {
+      return res.status(404).json({ error: 'Invalid activation token' });
+    }
+
+    // Update customer's active status to true
+    activateCustomer.active = true;
+    activateCustomer.activationToken = undefined; // Clear the activation token
+    await activateCustomer.save();
+
+    res.status(200).json({ message: 'Account activated successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 
 const customerLogin = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Validate request parameters
     if (!email || !password) {
       return res.status(400).json({ error: "Email and password are required fields." });
     }
 
-    const existingCustomer = await customer.findOne({ email: email });
+    const existingCustomer = await customer.findOne({ email });
 
     if (!existingCustomer) {
-      return res.status(401).json({
-        status: 401,
-        message: "customer does not exist"
+      return res.status(404).json({
+        error: "Customer does not exist"
       });
     }
 
-    // Compare hashed passwords using bcrypt.compare
     const passwordMatch = await bcrypt.compare(password, existingCustomer.password);
     if (!passwordMatch) {
       return res.status(401).json({
-        status: 401,
-        message: "Invalid credentials"
+        error: "Invalid credentials"
       });
     }
 
-    // Update the last_login field with the current date and time
     existingCustomer.last_login = new Date();
     await existingCustomer.save();
 
-    // Generate JWT tokens
     const accessToken = generateToken(existingCustomer);
-    const refreshToken = generateRefreshToken(existingCustomer, '7d'); // Set refresh token expiration to 7 days
+    const refreshToken = generateRefreshToken(existingCustomer, '7d');
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Logged in successfully",
-      accessToken: accessToken,
+      accessToken,
       tokenType: "Bearer",
       expiresIn: "1h",
-      refreshToken: refreshToken
+      refreshToken
     });
   } catch (error) {
-    console.error(error); // Log the error for debugging purposes
-    res.status(500).json({ error: "Login failed. Please try again later." });
+    console.error(error);
+    return res.status(500).json({ error: "Login failed. Please try again later." });
   }
 };
 
-module.exports = customerLogin;
+
+
+
+
+
 
 
 
@@ -215,12 +267,25 @@ const getCustomer = async (req, res)  => {
         })
       }
 
+//total customers
+const getTotalCustomers = async (req, res) => {
+  try {
+    const totalCustomers = await customer.countDocuments({});
+    res.status(200).json( totalCustomers );
+  } catch (error) {
+    console.error('Error getting total customers:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
 module.exports = {
   createCustomer: createCustomer,
   customerLogin: customerLogin,
+  activateAccount:activateAccount,
   getAllCustomers: getAllCustomers,
   searchCustomer: searchCustomer,
   getCustomer:getCustomer,
   updateCustomer:updateCustomer,
-  deleteCustomer:deleteCustomer
+  deleteCustomer:deleteCustomer,
+  getTotalCustomers:getTotalCustomers
 };

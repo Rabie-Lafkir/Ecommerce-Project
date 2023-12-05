@@ -1,0 +1,86 @@
+.datatable {
+    padding: 20px;
+}
+
+.tabContent{
+    background-color: #fff;
+}
+ .datatableTitle {
+    width: 100%;
+    font-size: 24px;
+   
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+ .link {
+    color:#0a5693;
+    font-size: 16px;
+    font-weight: 400;
+    border: 1px solid #0a5693;
+    padding: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+ .datagrid {
+    color: #616161;
+    border: none;
+}
+
+.cellWithActive {
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.cellWithActive.yes {
+    background-color: rgba(0, 128, 0, 0.05);
+    color: green;
+}
+
+.cellWithActive.no {
+    background-color: rgba(255, 0, 0, 0.05);
+    color: crimson;
+}
+
+ .cellAction {
+    align-items: center;
+    display: flex;
+    gap: 15px;
+}
+
+ .editButton{
+    padding: 2px 5px;
+    border-radius: 5px;
+    color: #0a5693;
+    /* color: #002db3; */
+    /* border: 1px dotted rgba(0, 0, 139, 0.596); */
+    cursor: pointer;
+}
+
+ .deleteButton {
+    padding: 2px 5px;
+    color: crimson; 
+    /* border-radius: 5px;
+    color: crimson; 
+    border: 1px dotted rgba(220, 20, 60, 0.6);*/
+
+    cursor: pointer;
+   
+   
+ ;
+}
+
+
+.listUser{
+    color:#0a5693;
+    font-weight: bold;
+}
+.headerNameStyle {
+    font-weight: bold;
+ color: white;
+ font-size: 15px;
+   background-color: #0a5693;
+  }

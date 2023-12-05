@@ -1,0 +1,24 @@
+
+.titleEditUser {
+    text-align: center;
+    color: white;
+    background-color: #0a5693;
+    font-size: 1.25rem;
+  }
+  
+  .buttonCancel {
+    color: black;
+    background-color: #ccc;
+  }
+  .buttonSubmit {
+    background-color: #0a5693;
+    color: white;
+  }
+  .buttonCancel,
+  .buttonSubmit {
+    
+    padding: 10px 20px;
+  
+    cursor: pointer;
+   
+  }

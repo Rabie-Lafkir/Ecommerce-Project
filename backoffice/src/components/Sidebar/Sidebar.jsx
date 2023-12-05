@@ -1,26 +1,34 @@
 import React, { useState } from "react";
 import { HiMenuAlt3 } from "react-icons/hi";
 import { MdOutlineDashboard } from "react-icons/md";
-import { RiSettings4Line } from "react-icons/ri";
-import { TbReportAnalytics } from "react-icons/tb";
-import { AiOutlineUser, AiOutlineHeart } from "react-icons/ai";
-import { FiMessageSquare, FiFolder, FiShoppingCart } from "react-icons/fi";
+//import { RiSettings4Line } from "react-icons/ri";
+//import { TbReportAnalytics } from "react-icons/tb";
+import { AiOutlineUser} from "react-icons/ai";
+import { FiUsers } from "react-icons/fi";
+import { GoPackage } from "react-icons/go";
+//import { MdAttachMoney } from "react-icons/md";
+import { IoSettingsOutline } from "react-icons/io5";
+import { MdOutlineCategory } from "react-icons/md";
+
+import {  FiShoppingCart } from "react-icons/fi";
 import Avatar from '@mui/material/Avatar';
 import { Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 const profile = require('../../assets/profile.jpg')
 
 
+
+
+
 const SideBar = () => {
   const menus = [
-    { name: "Dashboard", link: "/dashboard", icon: MdOutlineDashboard },
+    { name: "Dashboard", link: "/home", icon: MdOutlineDashboard },
     { name: "Users", link: "/users", icon: AiOutlineUser },
-    { name: "Customers", link: "/customers", icon: FiMessageSquare },
-    { name: "Products", link: "/products", icon: TbReportAnalytics},
-    { name: "Orders", link: "/order", icon: FiShoppingCart },
-    { name: "Payments", link: "/payments", icon: FiShoppingCart },
-    { name: "Saved", link: "/saved", icon: AiOutlineHeart },
-    { name: "Setting", link: "/settings", icon: RiSettings4Line },
+    { name: "Customers", link: "/customers", icon: FiUsers },
+    { name: "Products", link: "/products", icon: GoPackage},
+    { name: "Orders", link: "/orders", icon: FiShoppingCart },
+    { name: "Categories", link: "/category", icon: MdOutlineCategory },
+    { name: "Setting", link: "/settings", icon: IoSettingsOutline },
   ];
 
  
@@ -28,7 +36,7 @@ const SideBar = () => {
   return (
     <section className="flex gap-6">
       <div
-        className={`bg-[#111827] min-h-screen ${
+        className={`bg-[#0a5693] min-h-screen ${
           open ? "w-72" : "w-16"
         } duration-500 text-gray-100 px-4`}
       >
@@ -53,7 +61,7 @@ const SideBar = () => {
           />
           <Typography
             align="center"
-            sx={{ fontSize: open ? 17 : 0, transition: "0.25s" }}
+            sx={{ fontSize: open ? 22 : 0, fontWeight:"bold", transition: "0.25s" }}
           >
             {" "}
             Rabie Lafkir{" "}
@@ -61,7 +69,8 @@ const SideBar = () => {
           <Typography
             align="center"
             sx={{
-              fontSize: open ? 15 : 0,
+              fontSize: open ? 17 : 0,
+              fontWeight: "bold",
               transition: "0.25s",
               color: "#fff",
             }}
@@ -75,7 +84,8 @@ const SideBar = () => {
               key={i}
               className={` ${
                 menu?.margin && "mt-5"
-              } group flex items-center text-sm  gap-3.5 font-medium p-2 hover:bg-slate-500  rounded-md`}
+              } group flex items-center  gap-3.5 font-medium p-2 hover:bg-sky-700  rounded-md`}
+              style={{ color: "#fff", fontWeight: "bold", fontSize: "18px" }}
             >
               <div>{React.createElement(menu?.icon, { size: "20" })}</div>
               <h2
@@ -88,13 +98,13 @@ const SideBar = () => {
               >
                 {menu?.name}
               </h2>
-              <h2
+              {/* <h2
                 className={`${
                   open && "hidden"
                 } absolute left-48 bg-white font-semibold whitespace-pre text-gray-900 rounded-md drop-shadow-lg px-0 py-0 w-0 overflow-hidden group-hover:px-2 group-hover:py-1 group-hover:left-14 group-hover:duration-300 group-hover:w-fit  `}
               >
                 {menu?.name}
-              </h2>
+              </h2> */}
             </Link>
           ))}
         </div>

@@ -1,113 +1,153 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-//import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import FormAdd from "../FormAdd/FormAdd";
+import FormEdit from "../FormEdit/FormEdit";
+import Swal from 'sweetalert2';
 import axios from "axios";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  FormControl,
-  MenuItem,
-  Select,
-  InputLabel,
-} from "@mui/material";
+import { Dialog, DialogContent, DialogActions, Button } from "@mui/material";
 import "./DataTable.css";
-import { Link } from "react-router-dom";
+//import { Link } from "react-router-dom";
 
 const userColumns = [
-  { field: "id", headerName: "ID", width: 70 },
+  {
+    field: "id",
+    headerName: "ID",
+    flex: 1,
+    headerClassName: "headerNameStyle",
+  },
   {
     field: "user",
     headerName: "Username",
-    width: 230,
+    flex: 1,
     renderCell: (params) => {
-      return (
-        <div className="cellWithImg">
-         
-          {params.row.username}
-        </div>
-      );
+      return <div className="cellWithImg">{params.row.username}</div>;
     },
+    headerClassName: "headerNameStyle",
   },
-  { field: "email", headerName: "Email", width: 200 },
- 
+  {
+    field: "firstname",
+    headerName: "First Name",
+    flex: 1,
+    headerClassName: "headerNameStyle",
+  },
+  {
+    field: "lastname",
+    headerName: "Last Name",
+    flex: 1,
+    headerClassName: "headerNameStyle",
+  },
+  {
+    field: "role",
+    headerName: "Role",
+    flex: 1,
+    headerClassName: "headerNameStyle",
+  },
+
+  {
+    field: "email",
+    headerName: "Email",
+    flex: 1,
+    headerClassName: "headerNameStyle",
+  },
+
   {
     field: "active",
     headerName: "Active",
-    width: 160,
-    renderCell: (params) => {
-      return (
-        <div className={`cellWithActive ${params.row.active}`}>
-          {params.row.active}
-        </div>
-      );
-    },
+    flex: 1,
+    headerClassName: "headerNameStyle",
   },
 ];
 
 export default function Datatable() {
   const [data, setData] = useState([]);
-
+  const [deleteUserId, setDeleteUserId] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
 
-  const [editedUser, setEditedUser] = useState({
-    id: "",
-    username: "",
-    active: false,
-    email: "",
-  });
+  const [openForm, setOpenForm] = useState(false);
 
+  const [deleteUsername, setDeleteUsername] = useState(null);
+
+  const [editUserId, setEditUserId] = useState(null);
+  const [openFormEdit, setOpenFormEdit] = useState(false);
+
+  const handleEdit = (id) => {
+    setEditUserId(id);
+    setOpenFormEdit(true);
+  };
+
+  const styles = {
+    cancelButton: {
+      color: "black",
+      backgroundColor: "#ccc",
+    },
+    confirmButton: {
+      color: "white",
+      backgroundColor: "#0a5693",
+    },
+  };
   useEffect(() => {
-    axios.get('http://localhost:5000/v1/users')
-      .then(response => {
-        const formattedData = response.data.map(user => ({
+    axios
+      .get("http://localhost:5000/v1/users")
+      .then((response) => {
+        const formattedData = response.data.map((user) => ({
           id: user._id,
           username: user.user_name,
+          lastname: user.last_name,
+          firstname: user.first_name,
+          role: user.role,
+
           email: user.email,
           active: user.active,
-            
         }));
         setData(formattedData);
-        console.log(formattedData)
+        console.log(formattedData);
       })
-      .catch(error => {
-        console.error('Error fetching data:', error);
+      .catch((error) => {
+        console.error("Error fetching data:", error);
       });
-  }, []);
-  
-
- 
+  }, [openFormEdit, openForm, openDialog]);
+  //delete
   const handleDelete = (id) => {
-    setData(data.filter((item) => item.id !== id));
-  };
-  const handleEditClick = (params) => {
-    setEditedUser({
-      id: params.row.id,
-      username: params.row.username,
-      active: params.row.active,
-      email: params.row.email,
-    });
+    setDeleteUserId(id);
     setOpenDialog(true);
   };
 
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
+  const handleConfirmDelete = () => {
+    axios
+      .delete(`http://localhost:5000/v1/users/${deleteUserId}`)
+      .then((res) => {
+        console.log(res.data);
+        Swal.fire({
+          title: "Deleted!",
+          text:"'User deleted successfully.'",
+          icon:'success',
+        });
+      })
+      .catch((error) => {
+        //console.error("Error deleting user ", error);
+        Swal.fire({
+          title: "Failed!",
+          text:  error.message,
+          icon:'error',
+        });
+      })
+      .finally(() => {
+        setDeleteUserId(null);
+        setDeleteUsername(null);
+        setOpenDialog(false);
+      });
   };
 
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setEditedUser((prevUser) => ({
-      ...prevUser,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
-
-  const handleFormSubmit = () => {
+  useEffect(() => {
+    if (deleteUserId) {
+      const userToDelete = data.find((user) => user.id === deleteUserId);
+      setDeleteUsername(userToDelete ? userToDelete.username : null);
+    }
+  }, [deleteUserId, data]);
+  const handleCancelDelete = () => {
+    setDeleteUserId(null);
     setOpenDialog(false);
   };
 
@@ -115,14 +155,20 @@ export default function Datatable() {
     {
       field: "action",
       headerName: "Action",
-      width: 200,
+      sortable: false,
+      flex: 1,
       renderCell: (params) => {
         return (
           <div className="cellAction">
-            <div className="editButton" onClick={() => handleEditClick(params)}>
+            <div
+              className="editButton"
+              onClick={() => {
+                handleEdit(params.row.id);
+                //console.log("params" + params.row.id);
+              }}
+            >
               <EditOutlinedIcon />
             </div>
-
             <div
               className="deleteButton"
               onClick={() => handleDelete(params.row.id)}
@@ -132,6 +178,7 @@ export default function Datatable() {
           </div>
         );
       },
+      headerClassName: "headerNameStyle",
     },
   ];
 
@@ -139,78 +186,48 @@ export default function Datatable() {
     <div className="datatable">
       <div className="datatableTitle">
         <span className="listUser">List of Users</span>
-        <Link to="/users/userId/new" style={{ textDecoration: "none" }}>
-          <span className="link">Add New User</span>
-        </Link>
-      </div>
-      <div className="tabContent">
-      <DataGrid
-        className="datagrid"
-        rows={data}
-        columns={userColumns.concat(actionColumn)}
-        pageSize={8}
-        rowsPerPageOptions={[5]}
-        checkboxSelection
-      />
-      </div>
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle
-          style={{
-            textAlign: "center",
-            backgroundColor: "#7451f8",
-            color: "#fff",
-          }}
-        >
-          Edit User
-        </DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Username"
-            name="username"
-            value={editedUser.username}
-            onChange={handleInputChange}
-            fullWidth
-            margin="normal"
-          />
 
-          <FormControl
-            fullWidth
-            margin="normal"
-            variant="outlined"
-            style={{ borderColor: "#7451f8" }}
-          >
-            <InputLabel id="active-label">Active</InputLabel>
-            <Select
-              labelId="active-label"
-              id="active"
-              name="active"
-              value={editedUser.active ? "yes" : "no"}
-              onChange={handleInputChange}
-              label="Active"
-            >
-              <MenuItem value="yes">Yes</MenuItem>
-              <MenuItem value="no">No</MenuItem>
-            </Select>
-          </FormControl>
-          <TextField
-            label="Email"
-            name="email"
-            value={editedUser.email}
-            onChange={handleInputChange}
-            fullWidth
-            margin="normal"
-          />
+        <span className="link" onClick={() => setOpenForm(true)}>
+          Add New User
+        </span>
+      </div>
+
+      {openForm && <FormAdd setOpenForm={setOpenForm} />}
+      {openFormEdit && (
+        <FormEdit setOpenFormEdit={setOpenFormEdit} userId={editUserId} />
+      )}
+
+      <div className="tabContent">
+        <DataGrid
+          initialState={{
+            columns: {
+              columnVisibilityModel: {
+                id: false,
+              },
+            },
+          }}
+          className="datagrid"
+          rows={data}
+          columns={userColumns.concat(actionColumn)}
+          pageSize={8}
+          rowsPerPageOptions={[5]}
+        />
+      </div>
+
+      <Dialog open={openDialog} onClose={handleCancelDelete}>
+        <DialogContent>
+          {deleteUsername && (
+            <>
+              Are you sure you want to delete <strong>{deleteUsername}</strong>?
+            </>
+          )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} style={{ color: "#7451f8" }}>
+          <Button onClick={handleCancelDelete} style={styles.cancelButton}>
             Cancel
           </Button>
-          <Button
-            onClick={handleFormSubmit}
-            style={{ backgroundColor: "#7451f8", color: "#fff" }}
-            variant="contained"
-          >
-            Save
+          <Button onClick={handleConfirmDelete} style={styles.confirmButton}>
+            Confirm
           </Button>
         </DialogActions>
       </Dialog>

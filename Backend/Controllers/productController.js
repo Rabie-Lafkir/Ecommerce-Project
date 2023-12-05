@@ -1,279 +1,263 @@
-const mongoose = require('mongoose');
-const { Product } = require('../Models/product');
+const mongoose = require("mongoose");
+const { Product } = require("../Models/product");
+const { Categories } = require("../Models/categorie");
 const ObjectId = mongoose.Types.ObjectId;
 
 // Create a new product
 const createProduct = async (req, res) => {
-    try {
-        // Ensure only users with admin and manager roles can create a product
-        const {
-            sku,
-            productImage,
-            productName,
-            subcategoryID,
-            shortDescription,
-            longDescription,
-            price,
-            quantity,
-            discountPrice,
-            options,
-        } = req.body;
+  try {
+   
+    const {
+      sku,
+  
+      product_name,
+      categoryLink,
+      short_description,
+      long_description,
+      price,
+      quantity,
+      discount_price,
+      options,
+    } = req.body;
 
-        const newProduct = new Product({
-            sku: sku,
-            product_image: productImage,
-            product_name: productName,
-            subcategory_id: subcategoryID,
-            short_description: shortDescription,
-            long_description: longDescription,
-            price: price,
-            quantity: quantity,
-            discount_price: discountPrice,
-            options: options,
-        });
+    console.log(req.body)
+    const product_image = req.file ? req.file.path : null;
 
-        await newProduct.save();
 
-        res.status(201).json({ status: 201, message: 'Product created successfully', newProduct });
-    } catch (error) {
-        res.status(500).json({ status: 500, error: error.message });
-    }
+
+    const newProduct = new Product({
+      sku,
+      product_image,
+      product_name,
+      categoryLink,
+      short_description,
+      long_description,
+      price,
+      quantity,
+      discount_price: discount_price,
+      options,
+    });
+
+    const prod = await newProduct.save();
+    console.log(prod)
+
+    res.status(201).json({
+      status: 201,
+      message: "Product created successfully",
+      newProduct,
+    });
+  } catch (error) {
+    res.status(500).json({ status: 500, error: error.message });
+  }
 };
 
-
-
+//get all product
 const listProducts = async (req, res, next) => {
-    try {
-      const page = req.query.page || 1;
-      const limit = 2;
-      const skip = (page - 1) * limit;
-      const product = await Product.aggregate([
-        {
-          $lookup: {
-            from: "subcategories",
-            localField: "subcategory_id",
-            foreignField: "_id",
-            as: "subcategory",
-          },
-        },
-        {
-          $skip: skip,
-        },
-        {
-          $limit: limit,
-        },
-        {
-          $project: {
-            _id: 1,
-            sku: 1,
-            product_image: 1,
-            product_name: 1,
-            categoryName: "$subcategory.subcategory_name",
-            short_description: 1,
-            price: 1,
-            discount_price: 1,
-            options: 1,
-            active: 1,
-          },
-        },
-      ]);
-  
-      res.status(200).json(product);
-    } catch (err) {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-      }
-      next(err);
-    }}
+  try {
+    const page = req.query.page || 1;
+    const limit = 70;
+    const skip = (page - 1) * limit;
 
+    const products = await Product.find()
+      .populate('categoryLink'); 
+
+    res.status(200).json(products);
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
 
 // Search for a product
 const searchProducts = async (req, res) => {
-    try {
-        const query = req.query.query;
-        const page = parseInt(req.query.page) || 1;
-        const perPage = 1;
+  try {
+    const query = req.query.query;
+    const page = parseInt(req.query.page) || 1;
+    const perPage = 1;
 
-        const products = await Product.aggregate([
-            {
-                $match: {
-                    productName: { $regex: query, $options: 'i' }, // Case-insensitive search
-                },
-            },
-            {
-                $project: {
-                    _id: 1,
-                    sku: 1,
-                    productImage: 1,
-                    productName: 1,
-                    subcategoryID: 1,
-                    subcategoryName: '$subcategoryName', // Modify this to match your schema structure
-                    shortDescription: 1,
-                    price: 1,
-                    quantity: 1,
-                    discountPrice: 1,
-                    active: 1,
-                },
-            },
-            {
-                $skip: (page - 1) * perPage,
-            },
-            {
-                $limit: perPage,
-            },
-        ]);
+    const products = await Product.aggregate([
+      {
+        $match: {
+          productName: { $regex: query, $options: "i" }, // Case-insensitive search
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          sku: 1,
+          productImage: 1,
+          productName: 1,
+          categoryLink: 1,
+          category_name: "$category_name", // Modify this to match your schema structure
+          shortDescription: 1,
+          price: 1,
+          quantity: 1,
+          discountPrice: 1,
+          active: 1,
+        },
+      },
+      {
+        $skip: (page - 1) * perPage,
+      },
+      {
+        $limit: perPage,
+      },
+    ]);
 
-        res.status(200).json({ status: 200, data: products });
-    } catch (error) {
-        res.status(500).json({ status: 500, error: error.message });
-    }
+    res.status(200).json({ status: 200, data: products });
+  } catch (error) {
+    res.status(500).json({ status: 500, error: error.message });
+  }
 };
 
 // Get a product by ID
 const getProductById = async (req, res) => {
-    try {
-        const productId = req.params.id;
-        console.log('Product ID:', productId);
+  const id=req.params.id;
 
-        if (!ObjectId.isValid(productId)) {
-            return res.status(400).json({ status: 400, message: 'Invalid product ID' });
-        }
+  console.log("Received Product ID:", id); 
 
-        const pipeline = [
-            {
-                $match: {
-                    _id: new ObjectId(productId),
-                },
-            },
-            {
-                $lookup: {
-                    from: 'subcategories', // Modify this to match your collection name
-                    localField: 'subcategoryID',
-                    foreignField: '_id',
-                    as: 'subcategory',
-                },
-            },
-            {
-                $unwind: '$subcategory',
-            },
-            {
-                $project: {
-                    _id: 1,
-                    sku: 1,
-                    productImage: 1,
-                    productName: 1,
-                    subcategoryID: 1,
-                    subcategoryName: '$subcategory.name', // Modify this to match your schema structure
-                    shortDescription: 1,
-                    longDescription: 1,
-                    price: 1,
-                    quantity: 1,
-                    discountPrice: 1,
-                    active: 1,
-                    options: 1,
-                },
-            },
-        ];
-
-        const product = await Product.aggregate(pipeline);
-
-        if (product.length === 0) {
-            return res.status(404).json({ status: 404, message: 'Product not found' });
-        }
-
-        console.log('Product Data:', product);
-        res.status(200).json(product);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ status: 500, error: error.message });
+  try {
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json({ status: 400, message: 'Invalid product ID' });
     }
+
+    const product = await Product.find({_id:id})
+    .populate({
+      path: 'categoryLink',
+      select: 'category_name', 
+    });; 
+
+    if (!product || product.length === 0) {
+      return res.status(404).json({ status: 404, message: 'Product not found' });
+    }
+
+    res.status(200).json({ status: 200, data: product });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      status: 500,
+      message: `Error retrieving product with id: ${id}`,
+      error: error.message,
+    });
+  }
 };
+
+
+
+
 
 // Update the product data
 const updateProduct = async (req, res) => {
-    try {
-        const productId = req.params.id;
-        console.log('Request Params:', req.params);
-        console.log('Product ID:', productId);
+  try {
+    const productId = req.params.id;
+    console.log("Request Params:", req.params);
+    console.log("Product ID:", productId);
 
-        if (!mongoose.Types.ObjectId.isValid(productId)) {
-            console.log('Invalid Product ID:', productId);
-            return res.status(400).json({ status: 400, message: 'Invalid product ID' });
-        }
-
-        const updatedFields = req.body;
-        console.log('Updated Fields:', updatedFields); // Add this line for debugging
-
-        if (updatedFields.productName) {
-            const existingProduct = await Product.findOne({
-                productName: updatedFields.productName,
-                _id: { $ne: productId },
-            });
-            if (existingProduct) {
-                return res.status(400).json({ status: 400, message: 'The product name should be unique' });
-            }
-        }
-
-        // Include user role check if required
-        // const user = req.user;
-        // if (!user || (user.role !== 'admin' && user.role !== 'manager')) {
-        //     return res.status(403).json({ status: 403, message: "You don't have enough privilege" });
-        // }
-
-        const updatedProduct = await Product.findByIdAndUpdate(productId, updatedFields, { new: true });
-
-        if (!updatedProduct) {
-            return res.status(404).json({ status: 404, message: 'Invalid product id' });
-        }
-
-        res.status(200).json({ status: 200, message: 'Product updated successfully', data: updatedProduct });
-    } catch (error) {
-        res.status(500).json({ status: 500, error: error.message });
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      console.log("Invalid Product ID:", productId);
+      return res
+        .status(400)
+        .json({ status: 400, message: "Invalid product ID" });
     }
-};
 
+    const updatedFields = req.body;
+   // console.log("Updated Fields:", updatedFields); // Add this line for debugging
+
+    /*if (updatedFields.productName) {
+      const existingProduct = await Product.findOne({
+        productName: updatedFields.productName,
+        _id: { $ne: productId },
+      });
+      if (existingProduct) {
+        return res
+          .status(400)
+          .json({ status: 400, message: "The product name should be unique" });
+      }
+    }*/
+
+    // Include user role check if required
+    // const user = req.user;
+    // if (!user || (user.role !== 'admin' && user.role !== 'manager')) {
+    //     return res.status(403).json({ status: 403, message: "You don't have enough privilege" });
+    // }
+    console.log('¨ loll ¨',updatedFields)
+    const updatedProduct = await Product.findByIdAndUpdate(
+      productId,
+      updatedFields,
+      { new: true }
+    );
+
+    if (!updatedProduct) {
+      return res
+        .status(404)
+        .json({ status: 404, message: "Invalid product id" });
+    }
+
+    res.status(200).json({
+      status: 200,
+      message: "Product updated successfully",
+      data: updatedProduct,
+    });
+  } catch (error) {
+    res.status(500).json({ status: 500, error: error.message });
+  }
+};
 
 // delete a product
 const deleteProduct = async (req, res) => {
-    try {
-        const productId = req.params.id;
+  try {
+    const productId = req.params.id;
 
-        // Check if productId is not a valid ObjectId
-        if (!ObjectId.isValid(productId)) {
-            return res.status(400).json({ status: 400, message: 'Invalid product ID' });
-        }
-
-        const product = await Product.findById(productId);
-
-        if (!product) {
-            return res.status(404).json({ status: 404, message: 'Product not found' });
-        }
-
-        // Remove the role check temporarily for testing
-        // const user = req.user; // Assuming you're using a middleware to attach the user to the request
-        // if (!user || (user.role !== 'admin' && user.role !== 'manager' && user.role !== 'otherRole')) {
-        //     return res.status(403).json({ status: 403, message: "You don't have enough privilege" });
-        // }
-
-        const deletedProduct = await Product.findByIdAndRemove(productId);
-
-        if (!deletedProduct) {
-            return res.status(404).json({ status: 404, message: 'Failed to delete the product' });
-        }
-
-        res.status(200).json({ status: 200, message: 'Product deleted successfully' });
-    } catch (error) {
-        res.status(500).json({ status: 500, error: error.message });
+   
+    if (!ObjectId.isValid(productId)) {
+      return res
+        .status(400)
+        .json({ status: 400, message: "Invalid product ID" });
     }
+
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return res
+        .status(404)
+        .json({ status: 404, message: "Product not found" });
+    }
+
+    
+    const deletedProduct = await Product.findByIdAndRemove(productId);
+
+    if (!deletedProduct) {
+      return res
+        .status(404)
+        .json({ status: 404, message: "Failed to delete the product" });
+    }
+
+    res
+      .status(200)
+      .json({ status: 200, message: "Product deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ status: 500, error: error.message });
+  }
 };
 
-
+const getTotalProducts = async (req, res) => {
+  try {
+    const totalProducts = await Product.countDocuments({});
+    res.status(200).json( totalProducts );
+  } catch (error) {
+    console.error('Error getting total products:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
 
 module.exports = {
-    createProduct,
-    listProducts,
-    updateProduct,
-    deleteProduct,
-    searchProducts,
-    getProductById,
+  createProduct,
+  listProducts,
+  updateProduct,
+  deleteProduct,
+  searchProducts,
+  getProductById,
+  getTotalProducts,
 };

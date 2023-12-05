@@ -1,0 +1,19 @@
+.bg-img-1{
+    background-image: url('../../assets/discover/discover1.webp');
+}
+
+.bg-img-2{
+    background-image: url('../../assets/discover/discover2.webp');
+}
+
+.bg-img-1,.bg-img-2{
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center ;
+    transition: background-size 0.3s ease;
+}
+
+.bg-img-1:hover,.bg-img-2:hover {
+    /* Zoom in on hover */
+    background-size:140%; /* Adjust the value for desired zoom level */
+  }

@@ -1,0 +1,7 @@
+.Category{
+    display: flex;
+   
+}
+.CategoryContainer{
+    flex:6;
+  } 

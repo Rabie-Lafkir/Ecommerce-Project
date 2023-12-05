@@ -1,117 +1,121 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-//import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import {ChevronRightCircle} from 'lucide-react'
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+//import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+//import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+//import { ChevronRightCircle } from "lucide-react";
 import axios from "axios";
 
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  FormControl,
-  MenuItem,
-  Select,
-  InputLabel,
-} from "@mui/material";
+// import {
+//   Dialog,
+//   DialogTitle,
+//   DialogContent,
+//   DialogActions,
+//   Button,
+//   TextField,
+//   FormControl,
+//   MenuItem,
+//   Select,
+//   InputLabel,
+// } from "@mui/material";
 
 import "../DataTable/DataTable.css";
 import { Link } from "react-router-dom";
 
-
-
 export default function OrdersDataTable() {
   const orderColumns = [
-    { field: "orderNumber", headerName: "Order number", width: 70 },
+    {
+      field: "orderNumber",
+      headerName: "Order Number",
+      flex: 1,
+      headerClassName: "headerNameStyle",
+    },
     {
       field: "customerName",
-      headerName: "Customer name",
-      width: 230,
+      headerName: "Customer Name",
+      flex: 1,
       renderCell: (params) => {
-        return (
-          <div className="cellWithImg">
-           
-            {params.row.customerName}
-          </div>
-        );
+        return <div className="cellWithImg">{params.row.customerName}</div>;
       },
+      headerClassName: "headerNameStyle",
     },
-    { field: "date", headerName: "Order date", width: 200 },
-   
+    {
+      field: "date",
+      headerName: "Order date",
+      flex: 1,
+      headerClassName: "headerNameStyle",
+    },
+
     {
       field: "status",
       headerName: "Status",
-      width: 160,
+      flex: 1,
       renderCell: (params) => {
         return (
-          <div className={`cellWithActive ${params.row.status}`}>
+          <div className={`cellWithStatus ${params.row.status}`}>
             {params.row.status}
           </div>
         );
       },
+      headerClassName: "headerNameStyle",
     },
   ];
 
   useEffect(() => {
-    axios.get('http://localhost:5000/v1/orders')
-  .then(response => {
-    const formattedData = response.data.data.map(order => ({
-      orderNumber: order.orderNumber,
-      customerName: order.customerFirstName + ' ' + order.customerLastName,
-      status: order.orderStatus || order.status,
-      date: order.orderDate || '', // Adjust if necessary
-    }));
-    setData(formattedData);
-    console.log(formattedData);
-  })
-  .catch(error => {
-    console.error('Error fetching data:', error);
-  });
-
+    axios
+      .get("http://localhost:5000/v1/orders")
+      .then((response) => {
+        const formattedData = response.data.data.map((order) => ({
+          orderNumber: order.orderNumber,
+          customerName: order.customerFirstName + " " + order.customerLastName,
+          status: order.orderStatus || order.status,
+          date: order.orderDate || "", // Adjust if necessary
+        }));
+        setData(formattedData);
+        console.log(formattedData);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
   }, []);
 
   const getRowId = (row) => row.orderNumber;
-
 
   const [data, setData] = useState([]);
 
   const [openDialog, setOpenDialog] = useState(false);
 
-  const [editedOrder, setEditedOrder] = useState({
-        orderNumber: "",
-        customerName: "",
-        date: "",
-        status: "",
-  });
+  /*const [editedOrder, setEditedOrder] = useState({
+    orderNumber: "",
+    customerName: "",
+    date: "",
+    status: "",
+  });*/
 
-  const handleDelete = (orderNumber) => {
-    setData(data.filter((item) => item.orderNumber !== orderNumber));
-  };
-  const handleEditClick = (params) => {
-    setEditedOrder({
-      orderNumber: params.row.orderNumber,
-      customerName: params.row.username,
-      date: params.row.date,
-      status: params.row.status,
-    });
-    setOpenDialog(true);
-  };
+  // const handleDelete = (orderNumber) => {
+  //   setData(data.filter((item) => item.orderNumber !== orderNumber));
+  // };
+  // const handleEditClick = (params) => {
+  //   setEditedOrder({
+  //     orderNumber: params.row.orderNumber,
+  //     customerName: params.row.username,
+  //     date: params.row.date,
+  //     status: params.row.status,
+  //   });
+  //   setOpenDialog(true);
+  // };
 
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-  };
+  // const handleCloseDialog = () => {
+  //   setOpenDialog(false);
+  // };
 
-  const handleInputChange = (e) => {
+  /*const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setEditedOrder((prevUser) => ({
       ...prevUser,
       [name]: type === "checkbox" ? checked : value,
     }));
-  };
+  };*/
 
   const handleFormSubmit = () => {
     setOpenDialog(false);
@@ -121,23 +125,27 @@ export default function OrdersDataTable() {
     {
       field: "action",
       headerName: "Action",
-      width: 200,
+    flex:1,
       renderCell: (params) => {
         return (
           <div className="cellAction">
-            <div className="detailsButton" onClick={() => handleEditClick(params)}>
-            <ChevronRightCircle />
+            <div
+              className="detailsButton"
+              // onClick={() => handleEditClick(params)}
+            >
+              <VisibilityOutlinedIcon />
             </div>
 
-            <div
+            {/* <div
               className="deleteButton"
               onClick={() => handleDelete(params.row.orderNumber)}
             >
               <DeleteOutlineOutlinedIcon />
-            </div>
+            </div> */}
           </div>
         );
       },
+      headerClassName : "headerNameStyle"
     },
   ];
 
@@ -150,13 +158,19 @@ export default function OrdersDataTable() {
         </Link>
       </div>
       <DataGrid
+        // initialState={{
+        //   columns: {
+        //     columnVisibilityModel: {
+        //       orderNumber: false,
+        //     },
+        //   },
+        // }}
         className="datagrid"
         rows={data}
         columns={orderColumns.concat(actionColumn)}
         getRowId={getRowId}
         pageSize={8}
         rowsPerPageOptions={[5]}
-        checkboxSelection
       />
       {/* <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle
@@ -218,7 +232,7 @@ export default function OrdersDataTable() {
             Save
           </Button>
         </DialogActions>
-      </Dialog> */}
+        </Dialog> */}
     </div>
   );
 }

@@ -268,11 +268,20 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
-
+const getTotalOrders = async (req, res) => {
+  try {
+    const totalOrders = await Order.countDocuments({});
+    res.status(200).json( totalOrders );
+  } catch (error) {
+    console.error('Error getting total orders:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
 module.exports = {
   createOrder,
   listOrders,
   getOrderById,
   updateOrderStatus,
+  getTotalOrders
 };
 

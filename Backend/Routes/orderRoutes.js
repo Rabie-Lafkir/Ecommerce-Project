@@ -3,6 +3,9 @@ const router = express.Router();
 const orderController = require('../Controllers/orderController');
 const { validateToken } = require('../Middlewares/authMiddleware');
 
+//total
+router.get('/totalorders', orderController.getTotalOrders);
+
 // List all orders with pagination support
 router.get('/', orderController.listOrders);
 
