@@ -22,7 +22,7 @@ router.get('/search', productController.searchProducts);
 router.get('/:id', productController.getProductById);
 
 // Update product data by ID
-router.patch('/:id', productController.updateProduct);
+router.patch('/:id',upload.single('product_image'), productController.updateProduct);
 
 // Delete a product by ID
 router.delete('/:id', productController.deleteProduct);

@@ -152,37 +152,24 @@ const getProductById = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
     const productId = req.params.id;
-    console.log("Request Params:", req.params);
-    console.log("Product ID:", productId);
 
     if (!mongoose.Types.ObjectId.isValid(productId)) {
-      console.log("Invalid Product ID:", productId);
-      return res
-        .status(400)
-        .json({ status: 400, message: "Invalid product ID" });
+      return res.status(400).json({ status: 400, message: "Invalid product ID" });
     }
 
-    const updatedFields = req.body;
-   // console.log("Updated Fields:", updatedFields); // Add this line for debugging
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ status: 404, message: "Product not found" });
+    }
 
-    /*if (updatedFields.productName) {
-      const existingProduct = await Product.findOne({
-        productName: updatedFields.productName,
-        _id: { $ne: productId },
-      });
-      if (existingProduct) {
-        return res
-          .status(400)
-          .json({ status: 400, message: "The product name should be unique" });
-      }
-    }*/
+    let updatedFields = req.body;
+    const product_image = req.file ? req.file.path : null;
 
-    // Include user role check if required
-    // const user = req.user;
-    // if (!user || (user.role !== 'admin' && user.role !== 'manager')) {
-    //     return res.status(403).json({ status: 403, message: "You don't have enough privilege" });
-    // }
-    console.log('¨ loll ¨',updatedFields)
+    if (product_image) {
+      // Mettre à jour le champ product_image uniquement s'il y a une nouvelle image
+      updatedFields = { ...updatedFields, product_image };
+    }
+
     const updatedProduct = await Product.findByIdAndUpdate(
       productId,
       updatedFields,
@@ -190,9 +177,7 @@ const updateProduct = async (req, res) => {
     );
 
     if (!updatedProduct) {
-      return res
-        .status(404)
-        .json({ status: 404, message: "Invalid product id" });
+      return res.status(404).json({ status: 404, message: "Product update failed" });
     }
 
     res.status(200).json({
