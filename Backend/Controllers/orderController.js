@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Order = require('../Models/order');
 const Customer = require('../Models/customer'); // Import the Customer model directly
+const Product = require('../Models/product'); // Import the Customer model directly
 
 // Create a new order
 // const createOrder = async (req, res) => {
@@ -58,50 +59,100 @@ const Customer = require('../Models/customer'); // Import the Customer model dir
 //     }
 // };
 
-const createOrder = async (req, res) => {
-    try {
-      const {
-        orderNumber,
-        cartTotalPrice,
-        orderDate,
-        orderStatus,
-        customer_id,
-        order_items,
-      } = req.body;
+// const createOrder = async (req, res) => {
+//     try {
+//       const {
+//         orderNumber,
+//         cartTotalPrice,
+//        // orderDate,
+//        status,
+//         customer_id,
+//         order_items,
+//       } = req.body;
   
-      // For demonstration purposes, generating placeholder product IDs
-      const productId1 = new mongoose.Types.ObjectId();
-      const productId2 = new mongoose.Types.ObjectId();
+//       // For demonstration purposes, generating placeholder product IDs
+//       const productId1 = new mongoose.Types.ObjectId();
+//       const productId2 = new mongoose.Types.ObjectId();
   
-      // For demonstration, updating order_items structure
-      const updatedOrderItems = [
-        {
-          productId: productId1,
-          quantity: 1,
-        },
-        {
-          productId: productId2,
-          quantity: 10,
-        },
-      ];
+//       // For demonstration, updating order_items structure
+//       const updatedOrderItems = [
+//         {
+//           productId: productId1,
+//           quantity: 1,
+//         },
+//         {
+//           productId: productId2,
+//           quantity: 10,
+//         },
+//       ];
   
-      const newOrder = new Order({
-        orderNumber: orderNumber,
-        cartTotalPrice: cartTotalPrice,
-        orderDate: orderDate,
-        orderStatus: orderStatus,
-        customer_id: customer_id,
-        order_items: updatedOrderItems,
-        // Assuming other fields are not relevant or handled differently
-      });
+//       const newOrder = new Order({
+//         orderNumber: orderNumber,
+//         cartTotalPrice: cartTotalPrice,
+//         orderDate: orderDate,
+//         orderStatus: orderStatus,
+//         customer_id: customer_id,
+//         order_items: updatedOrderItems,
+//         // Assuming other fields are not relevant or handled differently
+//       });
   
-      await newOrder.save();
+//       await newOrder.save();
   
-      res.status(201).json({ status: 201, message: 'Order created successfully' });
-    } catch (error) {
-      res.status(400).json({ status: 400, error: error.message });
+//       res.status(201).json({ status: 201, message: 'Order created successfully' });
+//     } catch (error) {
+//       res.status(400).json({ status: 400, error: error.message });
+//     }
+//   };
+
+createOrder = async (req, res) => {
+  try {
+    const { customer_id, order_items, cartTotalPrice, orderNumber } = req.body;
+
+    if (!customer_id || !order_items || !cartTotalPrice || !orderNumber) {
+      return res.status(400).json({ message: "Missing field" });
     }
-  };
+
+    let customerId;
+    let products;
+console.log("customer_id ",customer_id)
+    try {
+      customerId = await Customer.findOne({ _id: customer_id });
+
+      if (!customerId) {
+        return res.status(404).json({ message: "Customer id not found" });
+      }
+    } catch (error) {
+      if (error instanceof CastError) {
+        return res.status(400).json({ message: "Invalid customer id format" });
+      }
+      throw error; // Re-throw other errors
+    }
+
+    if (!Array.isArray(order_items) || order_items.length === 0) {
+      return res.status(400).json({ message: "Order items must be an array and not empty" });
+    }
+    console.log("order_items :",order_items)
+    const invalidProductIds = [];
+
+   
+
+    const newOrder = new Order({
+      customer_id: customerId._id,
+      order_items,
+      cartTotalPrice,
+      orderNumber,
+    });
+
+    await newOrder.save();
+    console.log("newOrder:", newOrder);
+
+    res.status(201).json({ message: "Order created successfully", newOrder });
+  } catch (err) {
+    console.error("Error in creating order: " + err.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
   
 
 // List all orders with specified criteria
@@ -157,44 +208,45 @@ const listOrders = async (req, res) => {
       const page = parseInt(req.query.page) || 1;
       const limit = 10;
       const skip = (page - 1) * limit;
+      const orders = await Order.find()
   
-      const orders = await Order.aggregate([
-        {
-          $lookup: {
-            from: 'customers',
-            localField: 'customer_id',
-            foreignField: '_id',
-            as: 'customerInfo',
-          },
-        },
-        {
-          $unwind: {
-            path: '$customerInfo',
-            preserveNullAndEmptyArrays: true, // Handles cases where customer_id doesn't match any customer
-          },
-        },
-        {
-          $project: {
-            orderNumber: 1, // Include orderNumber and orderStatus if they exist in your Order collection
-            orderStatus: 1,
-            customerFirstName: { $ifNull: ['$customerInfo.first_name', 'Unknown'] }, // Handling missing customer info
-            customerLastName: { $ifNull: ['$customerInfo.last_name', 'Unknown'] },
-            itemsTotal: { $size: { $ifNull: ['$order_items', []] } }, // Handling missing order_items
-            orderDate: 1,
-            cartTotalPrice: 1,
-            status: 1,
-          },
-        },
-      ])
-      .skip(skip)
-      .limit(limit);
+      // const orders = await Order.aggregate([
+      //   {
+      //     $lookup: {
+      //       from: 'customers',
+      //       localField: 'customer_id',
+      //       foreignField: '_id',
+      //       as: 'customerInfo',
+      //     },
+      //   },
+      //   {
+      //     $unwind: {
+      //       path: '$customerInfo',
+      //       preserveNullAndEmptyArrays: true, // Handles cases where customer_id doesn't match any customer
+      //     },
+      //   },
+      //   {
+      //     $project: {
+      //       orderNumber: 1, // Include orderNumber and orderStatus if they exist in your Order collection
+      //       orderStatus: 1,
+      //       customerFirstName: { $ifNull: ['$customerInfo.first_name', 'Unknown'] }, // Handling missing customer info
+      //       customerLastName: { $ifNull: ['$customerInfo.last_name', 'Unknown'] },
+      //       itemsTotal: { $size: { $ifNull: ['$order_items', []] } }, // Handling missing order_items
+      //       orderDate: 1,
+      //       cartTotalPrice: 1,
+      //       status: 1,
+      //     },
+      //   },
+      // ])
+      // .skip(skip)
+      // .limit(limit);
   
-      const formattedOrders = orders.map((order) => ({
-        _id: order._id, // If needed
-        orderNumber: order.orderNumber || 'N/A', // Ensuring presence of orderNumber
-        status: order.orderStatus || 'N/A', // Ensuring presence of orderStatus
-        // Other fields as needed
-      }));
+      // const formattedOrders = orders.map((order) => ({
+      //   _id: order._id, // If needed
+      //   orderNumber: order.orderNumber || 'N/A', // Ensuring presence of orderNumber
+      //   status: order.orderStatus || 'N/A', // Ensuring presence of orderStatus
+      //   // Other fields as needed
+      // }));
   
       res.status(200).json({ status: 200, data: orders });
     } catch (error) {
@@ -247,11 +299,11 @@ const getOrderById = async (req, res) => {
 // Update the order status
 const updateOrderStatus = async (req, res) => {
   try {
-      const userRole = req.user.role; // Ensure you are accessing the correct property to get the user's role
+      const userRole = req.user.role; 
 
-      if (userRole !== 'admin' && userRole !== 'manager') {
-          return res.status(403).json({ status: 403, message: 'You don\'t have enough privilege' });
-      }
+      // if (userRole !== 'admin' && userRole !== 'manager') {
+      //     return res.status(403).json({ status: 403, message: 'You don\'t have enough privilege' });
+      // }
 
       const orderId = req.params.id;
       const { status } = req.body;

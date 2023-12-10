@@ -8,6 +8,10 @@ const {upload} = require('../Middlewares/uploadMiddleware');
 
 //total
 router.get('/totalproducts',productController.getTotalProducts);
+//top 5 products
+router.get('/top5product',productController.getTopProducts);
+// prod par cat
+router.get('/prodcat',productController.getProductperCategory);
 // Create a new product
 router.post('/',upload.single('product_image'),productController.createProduct);
 

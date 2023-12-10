@@ -18,6 +18,12 @@ const userColumns = [
     headerClassName: "headerNameStyle",
   },
   {
+    field:"product_image",
+    headerName:"Product Image",
+    flex: 1,
+    headerClassName: "headerNameStyle",
+  },
+  {
     field: "product_name",
     headerName: "Name",
     flex: 1,

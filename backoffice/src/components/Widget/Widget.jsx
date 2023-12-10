@@ -11,7 +11,7 @@ function Widget ({ type }){
   let data;
 
   const [amount, setAmount] = useState(0);
-  //const [diff, setDiff] = useState(0);
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -24,9 +24,9 @@ function Widget ({ type }){
             case "order":
               apiUrl = 'http://localhost:5000/v1/orders/totalorders'; 
               break;
-            case "earning":
-              // earninnnnnnnnnng api
-              break;
+              case "earning":
+                apiUrl = 'http://localhost:5000/v1/revenue';
+                break;
             case "category":
               apiUrl = 'http://localhost:5000/v1/categories/totalcategories'; 
               break;
@@ -94,7 +94,7 @@ function Widget ({ type }){
       data = {
         title: "EARNINGS",
         isMoney: true,
-        link: "View net earnings",
+       
         icon: (
           <MonetizationOnOutlinedIcon
             className="icon"
@@ -108,7 +108,7 @@ function Widget ({ type }){
         title: "CATEGORIES",
         isMoney: false,
         link: (
-          <Link to="/categories" style={{ textDecoration: 'none' }}>
+          <Link to="/category" style={{ textDecoration: 'none' }}>
             See all categories
           </Link>
         ),
@@ -132,8 +132,10 @@ function Widget ({ type }){
       <div className="left">
         <span className="title">{data.title}</span>
         <span className="counter">
-          {data.isMoney && "$"} {amount}
-        </span>
+  {data.isMoney && "$"} {amount && typeof amount === 'object' ? amount.data.totalRevenue : amount}
+</span>
+
+       
         <span className="linkdash">{data.link}</span>
       </div>
       <div className="right">

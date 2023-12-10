@@ -1,6 +1,7 @@
 import React from 'react'
 import SideBar from '../../components/Sidebar/Sidebar';
 import Navbar from '../../components/Navbar/Navbar';
+import UserSet from '../../components/UserSet/UserSet';
 import './Setting.css';
 const Setting = () => {
   return (
@@ -8,7 +9,7 @@ const Setting = () => {
       <SideBar />
       <div className="settingContainer">
         <Navbar />
-     
+     <UserSet/>
       </div>
     </div>
   )

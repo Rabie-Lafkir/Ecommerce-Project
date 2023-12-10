@@ -11,6 +11,7 @@ import Product from './containers/product/Product';
 import Setting from './containers/settings/Settings';
 //import Loogin from './containers/Loogin/Loogin';
 import Category from './containers/category/Category';
+import Profile from './containers/Profile/Profile'
 function App() {
 
   return (
@@ -26,6 +27,7 @@ function App() {
          <Route path='/products' element={<Product/>}/>
          <Route  path='/settings' element={<Setting/>}/>
          <Route  path='/category' element={<Category/>}/>
+         <Route path='/profile' element={<Profile/>}/>
         </Routes>
       </Router>
     </div>

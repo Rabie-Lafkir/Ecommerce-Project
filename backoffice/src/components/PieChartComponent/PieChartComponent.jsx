@@ -1,16 +1,10 @@
-import React, { useCallback, useState } from "react";
-import { PieChart, Pie, Sector,Text  } from "recharts";
+import React, { useCallback, useState, useEffect } from "react";
+import { PieChart, Pie, Sector} from "recharts";
 import './PieChartComponent.css';
-const data = [
-  { name: "Product A", value: 400 },
-  { name: "Product B", value: 300 },
-  { name: "Product C", value: 100 },
-  { name: "Product D", value: 200 },
-  { name: "Product E", value: 250 },
- 
-];
+import axios from 'axios'
 
 const renderActiveShape = (props) => {
+
     const RADIAN = Math.PI / 180;
     const {
       cx,
@@ -84,31 +78,45 @@ const renderActiveShape = (props) => {
   };
 
 
-const PieChartComponent = () => {
+function PieChartComponent(){
   const [activeIndex, setActiveIndex] = useState(0);
+  
 
   const onPieEnter = useCallback((_, index) => {
     setActiveIndex(index);
   }, [setActiveIndex]);
-
+  const [topProducts, setTopProducts] = useState([]);
+  
+  useEffect(() => {
+    
+    const fetchTopProducts = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/v1/products/top5product"); 
+        setTopProducts(response.data);
+         console.log(response.data);
+      } catch (error) {
+        console.error("Error fetching top products:", error);
+      }
+    };
+  
+    fetchTopProducts();
+  }, []);
   return (
-    <PieChart width={400} height={400} className="piechartproduct">
-      <Text  x={200} y={50} textAnchor="middle" fontSize={20} fontWeight="bold" style={{ fill: '#000' }}>
-        HEELLOOOOOOO
-        </Text>
-      <Pie
-        activeIndex={activeIndex}
-        activeShape={renderActiveShape}
-        data={data}
-        cx={200}
-        cy={200}
-        innerRadius={80}
-        outerRadius={120}
-        fill="#8884d8"
-        dataKey="value"
-        onMouseEnter={onPieEnter}
-      />
-    </PieChart>
+    <PieChart width={500} height={500} className="piechartproduct"> 
+   
+    <Pie
+      activeIndex={activeIndex}
+      activeShape={renderActiveShape}
+      data={topProducts}
+      cx={250} 
+      cy={250} 
+      innerRadius={120}
+      outerRadius={180} 
+      fill="#8884d8"
+      dataKey="value"
+      onMouseEnter={onPieEnter}
+    />
+  </PieChart>
   );
 };
 

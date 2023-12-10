@@ -43,12 +43,11 @@ const Login = () => {
       );
      
       const data = response.data
-      console.log(response)
+      //console.log(response)
+      localStorage.setItem("access_token", data[1].access_token);
       
-      localStorage.setItem("access", data[1].access_token);
-      localStorage.setItem("refresh", response.data.refresh_Token);
-      console.log('response.data.refresh_Token : ',response.data.refresh_Token)
-       
+  
+     
       navigate("/home");
     
     } catch (error) {

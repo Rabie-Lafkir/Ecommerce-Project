@@ -1,38 +1,59 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
 import { HiMenuAlt3 } from "react-icons/hi";
 import { MdOutlineDashboard } from "react-icons/md";
-//import { RiSettings4Line } from "react-icons/ri";
-//import { TbReportAnalytics } from "react-icons/tb";
-import { AiOutlineUser} from "react-icons/ai";
+import { AiOutlineUser } from "react-icons/ai";
 import { FiUsers } from "react-icons/fi";
 import { GoPackage } from "react-icons/go";
-//import { MdAttachMoney } from "react-icons/md";
 import { IoSettingsOutline } from "react-icons/io5";
 import { MdOutlineCategory } from "react-icons/md";
 
-import {  FiShoppingCart } from "react-icons/fi";
-import Avatar from '@mui/material/Avatar';
+import { FiShoppingCart } from "react-icons/fi";
+//import Avatar from "@mui/material/Avatar";
 import { Typography } from "@mui/material";
 import { Link } from "react-router-dom";
-const profile = require('../../assets/profile.jpg')
-
-
-
-
+import logo from '../../assets/white-logo.png' 
 
 const SideBar = () => {
   const menus = [
     { name: "Dashboard", link: "/home", icon: MdOutlineDashboard },
     { name: "Users", link: "/users", icon: AiOutlineUser },
     { name: "Customers", link: "/customers", icon: FiUsers },
-    { name: "Products", link: "/products", icon: GoPackage},
+    { name: "Products", link: "/products", icon: GoPackage },
     { name: "Orders", link: "/orders", icon: FiShoppingCart },
     { name: "Categories", link: "/category", icon: MdOutlineCategory },
     { name: "Setting", link: "/settings", icon: IoSettingsOutline },
   ];
 
- 
   const [open, setOpen] = useState(true);
+
+  const [userInfo, setUserInfo] = useState({
+    first_name: "",
+    last_name: "",
+    role: "",
+  });
+
+  useEffect(() => {
+    const extractUserInfoFromToken = () => {
+      const token = localStorage.getItem("access_token");
+      //console.log("Token from localStorage:", token);
+
+      try {
+        const decodedToken = jwtDecode(token);
+
+        setUserInfo({
+          first_name: decodedToken.user.first_name,
+          last_name: decodedToken.user.last_name,
+          role: decodedToken.user.role,
+        });
+      } catch (error) {
+        console.error("You have an error:", error);
+      }
+    };
+
+    extractUserInfoFromToken();
+  }, []);
+    //console.log(userInfo)
   return (
     <section className="flex gap-6">
       <div
@@ -47,8 +68,15 @@ const SideBar = () => {
             onClick={() => setOpen(!open)}
           />
         </div>
+        <div className="flex justify-center items-center mb-4">
+          <img
+            src={logo}
+            alt="Logo"
+       className=""
+          />
+        </div>
         <div className="mt-4 flex flex-col gap-4 relative">
-          <Avatar
+          {/* <Avatar
             sx={{
               mx: "auto",
               width: open ? 88 : 30,
@@ -58,13 +86,17 @@ const SideBar = () => {
             }}
             alt="Rabie"
             src={profile}
-          />
+          /> */}
           <Typography
             align="center"
-            sx={{ fontSize: open ? 22 : 0, fontWeight:"bold", transition: "0.25s" }}
+            sx={{
+              fontSize: open ? 22 : 0,
+              fontWeight: "bold",
+              transition: "0.25s",
+              marginTop: 4,
+            }}
           >
-            {" "}
-            Rabie Lafkir{" "}
+            {userInfo.first_name} {userInfo.last_name}
           </Typography>{" "}
           <Typography
             align="center"
@@ -75,8 +107,7 @@ const SideBar = () => {
               color: "#fff",
             }}
           >
-            {" "}
-            Admin{" "}
+            {userInfo.role}
           </Typography>
           {menus?.map((menu, i) => (
             <Link
@@ -113,4 +144,4 @@ const SideBar = () => {
   );
 };
 
-export default  SideBar;
+export default SideBar;
