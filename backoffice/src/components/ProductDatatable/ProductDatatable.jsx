@@ -2,21 +2,24 @@ import React, { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import FormAdd from "../FormAdd/FormAdd";
-import FormEdit from "../FormEdit/FormEdit";
-
+import FormAdd from "../FormAdd/FormAddproduct";
+import FormEdit from "../FormEdit/FormEditproduct";
+import Swal from "sweetalert2";
 import axios from "axios";
 import { Dialog, DialogContent, DialogActions, Button } from "@mui/material";
-//import "./DataTable.css";
+import "../DataTable/DataTable.css";
 //import { Link } from "react-router-dom";
 
-const userColumns = [
+const productColumns = [
   {
-    field: "id",
-    headerName: "ID",
+    field: "product_image",
+    headerName: "Image",
     flex: 1,
     headerClassName: "headerNameStyle",
+
+    renderCell: (params) => <img src={params.row.product_image} alt="Image" />,
   },
+
   {
     field:"product_image",
     headerName:"Product Image",
@@ -44,22 +47,32 @@ const userColumns = [
   {
     field: "short_description",
     headerName: "Short description",
-    flex: 2,
+    flex: 1,
+    headerClassName: "headerNameStyle",
+  },
+  {
+    field: "long_description",
+    headerName: "Long description",
+    flex: 1,
     headerClassName: "headerNameStyle",
   },
 ];
 
-export default function Datatable() {
-  const [deleteUserId, setDeleteUserId] = useState(null);
+export default function ProductDatatable() {
   const [openDialog, setOpenDialog] = useState(false);
 
   const [openForm, setOpenForm] = useState(false);
+
+  const [editProductId, setEditProductId] = useState(null);
   const [openFormEdit, setOpenFormEdit] = useState(false);
-  const [deleteUsername, setDeleteUsername] = useState(null);
 
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [inputValue, setInputValue] = useState("");
+  const handleEdit = (id) => {
+    setEditProductId(id);
+    setOpenFormEdit(true);
+  };
 
   const styles = {
     cancelButton: {
@@ -84,46 +97,30 @@ export default function Datatable() {
     };
 
     fetchData();
-  }, []);
+  }, [openFormEdit, openForm, openDialog]);
 
   const rows = filteredProducts.map(({ _id, ...rest }) => ({
     id: _id,
     ...rest,
   }));
   //delete
-  const handleDelete = (id) => {
-    setDeleteUserId(id);
-    setOpenDialog(true);
-  };
+  function handleDelete(id) {
+    const conf = window.confirm("Do you want to delete?");
+    if (conf) {
+      axios
+        .delete(`http://localhost:5000/v1/products/${id}`)
+        .then((res) => {
+          Swal.fire({
+            title: "Success !",
+            text: "Your Product has been deleted!",
+            icon: "success",
+          });
+        })
+        .catch((err) => console.log(err));
+    }
+  }
 
-  const handleConfirmDelete = () => {
-    axios
-      .delete(`http://localhost:5000/v1/users/${deleteUserId}`)
-      .then((res) => {
-        console.log(res.data);
-      })
-      .catch((error) => {
-        console.error("Error deleting user ", error);
-      })
-      .finally(() => {
-        setDeleteUserId(null);
-        setDeleteUsername(null);
-        setOpenDialog(false);
-      });
-  };
-
-  // useEffect(() => {
-  //   if (deleteUserId) {
-  //     const userToDelete = data.find((user) => user.id === deleteUserId);
-  //     setDeleteUsername(userToDelete ? userToDelete.username : null);
-  //   }
-  // }, [deleteUserId, data]);
-  const handleCancelDelete = () => {
-    setDeleteUserId(null);
-    setOpenDialog(false);
-  };
   useEffect(() => {
-    // Filter users based on input value
     const filterProducts = () => {
       const filtered = products.filter((product) => {
         const productName = product.product_name || "";
@@ -147,9 +144,20 @@ export default function Datatable() {
       renderCell: (params) => {
         return (
           <div className="cellAction">
-            <div className="editButton" onClick={() => setOpenFormEdit(true)}>
+            <div
+              className="editButton"
+              onClick={() => {
+                handleEdit(params.row.id);
+                //console.log("params" + params.row.id);
+              }}
+            >
               <EditOutlinedIcon />
-              {openFormEdit && <FormEdit setOpenFormEdit={setOpenFormEdit} />}
+              {openFormEdit && editProductId && (
+                <FormEdit
+                  setOpenFormEdit={setOpenFormEdit}
+                  productId={editProductId}
+                />
+              )}
             </div>
 
             <div
@@ -168,20 +176,24 @@ export default function Datatable() {
   return (
     <div className="datatable">
       <div className="datatableTitle">
-        <span className="listUser">List of Users</span>
+        <span className="listProduct">List of Products</span>
 
         <span className="link" onClick={() => setOpenForm(true)}>
-          Add New User
+          Add New Product
         </span>
       </div>
-
-      {openForm && <FormAdd setOpenForm={setOpenForm} />}
       <input
         type="text"
         className="search"
         onChange={handleInput}
         placeholder="Search Products"
       />
+
+      {openForm && <FormAdd setOpenForm={setOpenForm} />}
+      {openFormEdit && (
+        <FormEdit setOpenFormEdit={setOpenFormEdit} productId={editProductId} />
+      )}
+
       <div className="tabContent">
         <DataGrid
           initialState={{
@@ -193,29 +205,11 @@ export default function Datatable() {
           }}
           className="datagrid"
           rows={rows}
-          columns={userColumns.concat(actionColumn)}
+          columns={productColumns.concat(actionColumn)}
           pageSize={8}
           rowsPerPageOptions={[5]}
         />
       </div>
-
-      <Dialog open={openDialog} onClose={handleCancelDelete}>
-        <DialogContent>
-          {deleteUsername && (
-            <>
-              Are you sure you want to delete <strong>{deleteUsername}</strong>?
-            </>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCancelDelete} style={styles.cancelButton}>
-            Cancel
-          </Button>
-          <Button onClick={handleConfirmDelete} style={styles.confirmButton}>
-            Confirm
-          </Button>
-        </DialogActions>
-      </Dialog>
     </div>
   );
 }

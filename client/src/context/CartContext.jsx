@@ -23,6 +23,8 @@ export const CartProvider = ({ children }) => {
     }
 
     cartQuantity += 1;
+    setCartItems((prevItems) => [...prevItems, product]);
+    
   };
 
   const removeFromCart = (itemId) => {

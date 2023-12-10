@@ -9,7 +9,7 @@ import "./CustomerDataTable.css";
 //import { Link } from "react-router-dom";
 
 export default function CustomerDatatable() {
-  const columns = [
+  const customerColumns = [
     {
       field: "fullName",
       headerName: "Full Name",
@@ -47,7 +47,9 @@ export default function CustomerDatatable() {
       headerClassName: "headerNameStyle",
     },
   ];
+  const [openDialog, setOpenDialog] = useState(false);
 
+  const [openForm, setOpenForm] = useState(false);
   const [customers, setCustomers] = useState([]);
   const [filteredcustomers, setFilteredCustomers] = useState([]);
   const [inputValue, setInputValue] = useState("");
@@ -75,7 +77,7 @@ export default function CustomerDatatable() {
     };
 
     fetchData();
-  }, []);
+  }, [openFormEdit, openForm, openDialog]);
 
   const handleEdit = (id) => {
     setEditCustomerId(id);
@@ -90,19 +92,22 @@ export default function CustomerDatatable() {
       flex: 1,
       renderCell: (params) => {
         return (
-          <div
-            className="cellAction"
-            onClick={() => {
-              handleEdit(params.row.id);
-            }}
-          >
-            <EditOutlinedIcon />
+          <div className="cellAction">
+            <div
+              className="editButton"
+              onClick={() => {
+                handleEdit(params.row.id);
+              }}
+            >
+              <EditOutlinedIcon />
+            </div>
           </div>
         );
       },
       headerClassName: "headerNameStyle",
     },
   ];
+  
   //search and filter
   useEffect(() => {
     // Filter users based on input value
@@ -123,12 +128,16 @@ export default function CustomerDatatable() {
   return (
     <div className="datatable">
       <div className="datatableTitle">
-        <span className="listUser">List of Customers</span>
+        <span className="listCustomers">List of Customers</span>
 
-        <span className="link">Add New Customer</span>
+        
       </div>
-      {openFormEdit && <UpdateCustomer setOpenFormEdit={setOpenFormEdit} customerId={editCustomerId}/>}
-
+      {openFormEdit && (
+      <UpdateCustomer
+        setOpenFormEdit={setOpenFormEdit}
+        customerId={editCustomerId}
+      />
+    )}
       <div className="tabContent">
         <DataGrid
           // initialState={{
@@ -140,7 +149,7 @@ export default function CustomerDatatable() {
           // }}
           className="datagrid"
           rows={rows}
-          columns={columns.concat(actionColumn)}
+          columns={customerColumns.concat(actionColumn)}
           pageSize={8}
           rowsPerPageOptions={[5]}
         />

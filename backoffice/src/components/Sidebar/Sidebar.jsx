@@ -18,6 +18,7 @@ const SideBar = () => {
   const menus = [
     { name: "Dashboard", link: "/home", icon: MdOutlineDashboard },
     { name: "Users", link: "/users", icon: AiOutlineUser },
+    { name: "Register", link: "/register", icon: AiOutlineUser },
     { name: "Customers", link: "/customers", icon: FiUsers },
     { name: "Products", link: "/products", icon: GoPackage },
     { name: "Orders", link: "/orders", icon: FiShoppingCart },
