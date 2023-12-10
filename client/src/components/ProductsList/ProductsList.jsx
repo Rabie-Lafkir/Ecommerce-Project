@@ -47,7 +47,7 @@ const ProductsList = () => {
           </CardBody>
           <CardFooter className='pt-0 flex justify-between'>
             <div color='dark blue' className='font-medium text-secondary'>
-              {product.price}
+              ${product.price}
             </div>
             <button className='bg-stone-100 hover:bg-secondary hover:text-white text-2xl text-stone-800 flex items-center justify-center rounded-full px-3 py-3' onClick={() => addToCart(product)}>
               <TbShoppingBagPlus />

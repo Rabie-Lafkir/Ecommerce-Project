@@ -1,10 +1,33 @@
 import { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import axios from "axios";
 
 export default function SearchBar({ isOpen, setIsOpen }) {
+  const [searchQuery, setSearchQuery] = useState("");
   const closeSearch = () => {
     setIsOpen(false);
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const searchQuery = event.target.elements["default-search"].value;
+
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/search?query=${searchQuery}`
+      );
+      // Handle the response data (e.g., display search results)
+      console.log("Search Results:", response.data);
+    } catch (error) {
+      console.error("Error fetching search results:", error);
+    }
+
+    closeSearch();
+  };
+
+  const handleChange = (event) => {
+    setSearchQuery(event.target.value); // Update search query on input change
   };
 
   return (
@@ -44,7 +67,10 @@ export default function SearchBar({ isOpen, setIsOpen }) {
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                   >
-                    <div className="absolute left-0 top-0 -ml-8 flex pr-2 pt-4 sm:-ml-10 sm:pr-4">
+                    <div
+                      className="absolute left-0 top-0 -ml-8 flex pr-2 pt-4 sm:-ml-10 sm:pr-4"
+                      onSubmit={handleSubmit}
+                    >
                       <button
                         type="button"
                         className="relative rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
@@ -58,7 +84,7 @@ export default function SearchBar({ isOpen, setIsOpen }) {
                   </Transition.Child>
                   <div className="flex h-full flex-col bg-white  w-full shadow-xl">
                     <div className="relative w-full flex-1">
-                      <form className="w-full">
+                      <form className="w-full" onSubmit={handleSubmit}>
                         <div className="relative">
                           <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                             <svg
@@ -81,7 +107,9 @@ export default function SearchBar({ isOpen, setIsOpen }) {
                             type="search"
                             id="default-search"
                             className="block w-full p-4 ps-10 text-sm text-gray-900 border border-primary bg-white focus:ring-secondary focus:border-secondary focus:outline-none"
-                            placeholder="What are you looking for ?"
+                            placeholder="What are you looking for?"
+                            value={searchQuery} // Bind input value to searchQuery state
+                            onChange={handleChange} // Handle input change
                             required
                           />
                           <button

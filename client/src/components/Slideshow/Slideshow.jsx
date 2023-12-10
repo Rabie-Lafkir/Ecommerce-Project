@@ -5,7 +5,6 @@ import { RxDotFilled } from "react-icons/rx";
 import backgroundImage1 from "../../assets/slider/sliderBackground.webp";
 import backgroundImage2 from "../../assets/slider/sliderBackground2.webp";
 import backgroundImage3 from "../../assets/slider/sliderBackground3.webp";
-
 const Slideshow = () => {
   const slides = [
     {
