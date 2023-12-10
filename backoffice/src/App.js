@@ -11,6 +11,7 @@ import Product from './containers/product/Product';
 import Setting from './containers/settings/Settings';
 //import Loogin from './containers/Loogin/Loogin';
 import Category from './containers/category/Category';
+import Register from "./components/page/Auth/Register";
 function App() {
 
   return (
@@ -20,6 +21,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/home" element={<Home />} />
+          <Route path="/register" element={<Register />} />
+
           <Route path="/users" element={<User />} />
           <Route path="/orders" element={<Order />} />
           <Route path='/customers' element={<Customer/>} />

@@ -15,6 +15,7 @@ export const CartProvider = ({ children }) => {
   // Function to add a product to the cart
   const addToCart = (product) => {
     setCartItems((prevItems) => [...prevItems, product]);
+    
   };
 
   // Function to remove a product from the cart
@@ -24,7 +25,6 @@ export const CartProvider = ({ children }) => {
     console.log("Updated Cart Items:", updatedCart); // Log updated cart items to check removal
     setCartItems(updatedCart);
   };
-  
 
   return (
     <CartContext.Provider value={{ cartItems, addToCart, removeFromCart }}>
