@@ -19,33 +19,27 @@ const productSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'Categories'},
   short_description: {
-    type: String, // Corrected from "text"
-    //required: true,
+    type: String,
   },
   long_description: {
-    type: String, // Corrected from "text"
-    //required: false, // Optional field
+    type: String, 
   },
   price: {
-    type: Number, // Corrected from "number"
-    //required: true,
+    type: Number, 
   },
 
 quantity: {
-  type: Number, // Corrected from "number"
-  //required: true,
+  type: Number, 
 },
   discount_price: {
-    type: Number, // Corrected from "number"
-    // required: false, // Optional field
+    type: Number, 
   },
   options: {
-    type: String, // You should specify the data type for "options" (e.g., it could be an array of strings)
-    //required: true,
+    type: String, 
   },
   active: {
     type: Boolean,
-    //required: false,
+    
   },
   
 }

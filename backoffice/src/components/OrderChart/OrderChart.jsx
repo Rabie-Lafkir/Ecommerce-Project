@@ -1,4 +1,4 @@
-import './OrderChart.css'
+/*import './OrderChart.css'
 import {
     AreaChart,
     Area,
@@ -50,4 +50,45 @@ function OrderChart({ aspect, title }){
     );
   };
   
+  export default OrderChart;*/
+  import React, { useEffect, useState } from "react";
+  import axios from "axios";
+  import {
+      BarChart,
+      Bar,
+      CartesianGrid,
+      XAxis,
+      YAxis,
+  } from "recharts";
+  import './OrderChart.css';
+  
+  function OrderChart() {
+
+      const [data, setData] = useState([]);
+  
+      useEffect(() => {
+      
+          axios.get("http://localhost:5000/v1/products/prodcat")
+              .then(response => {
+                
+                  setData(response.data);
+              })
+              .catch(error => {
+                  console.error("Erreur lors de la récupération des données de l'API :", error);
+              });
+      }, []); 
+      return (
+        <div className="chart"> 
+        <h2 className="titleProdCat">NUMBER OF PRODUCTS PER CATEGORY</h2>
+          <BarChart width={600} height={400} data={data} >
+              <Bar dataKey="productCount" fill="green" />
+              <CartesianGrid stroke="#ccc" />
+              <XAxis dataKey="category_name" />
+              <YAxis />
+          </BarChart>
+          </div>
+      );
+  }
+  
   export default OrderChart;
+  

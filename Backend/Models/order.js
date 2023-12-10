@@ -1,13 +1,16 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema({
-  // Existing fields in your Order schema
   customer_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Customer', // Assuming a reference to the Customer model
+    ref: "Customer",
     required: true,
   },
-  order_items: [/* Define your order items schema here */],
+  order_items: [
+    {
+      type: Array,
+    },
+  ],
   orderDate: {
     type: Date,
     default: Date.now,
@@ -18,22 +21,17 @@ const orderSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'processing', 'shipped', 'delivered'], // Define your status values
-    default: 'pending',
+    enum: ["Open", "Shipped", "Paid", "Closed", "Canceled"],
+    default: "Open",
   },
-  // New fields matching the modifications in the code
+
   orderNumber: {
     type: String,
     required: true,
     unique: true,
   },
-  orderStatus: {
-    type: String,
-    enum: ['created', 'confirmed', 'completed', 'canceled'], // Define your status values
-    default: 'created',
-  },
 });
 
-const Order = mongoose.model('Order', orderSchema);
+const Order = mongoose.model("Order", orderSchema);
 
 module.exports = Order;
