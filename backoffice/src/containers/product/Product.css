@@ -1,0 +1,7 @@
+.product{
+    display: flex;
+   
+}
+.productContainer{
+    flex:6;
+  } 

@@ -1,0 +1,10 @@
+.user{
+    display: flex;
+   
+}
+.usersContainer{
+    flex:6;
+    /* background-color:#f9fafb; */
+    /* background-image: linear-gradient(to right, #0a5693, #0a5693,  #ffffff); */
+        /* background-image: linear-gradient(to right, #0a5693, #ffffff);
+*/} 
