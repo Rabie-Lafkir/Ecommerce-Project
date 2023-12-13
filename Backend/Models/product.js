@@ -47,7 +47,7 @@ quantity: {
     type: Boolean,
     //required: false,
   },
-  
+
 }
 );
 

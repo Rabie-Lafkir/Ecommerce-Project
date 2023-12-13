@@ -16,7 +16,7 @@ const usersSchema = new mongoose.Schema({
   creation_date: { type: Date, default: Date.now },
   last_login: { type: Date, default: null },
   last_update: { type: Date, default: null },
-  active: { type: Boolean, default: false }
+  active: { type: Boolean, default:false}
 
 });
 

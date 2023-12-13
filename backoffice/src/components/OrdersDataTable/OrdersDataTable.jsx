@@ -1,28 +1,46 @@
 import React, { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-//import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-//import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-//import { ChevronRightCircle } from "lucide-react";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+} from "@mui/material";
+
 import axios from "axios";
 
-// import {
-//   Dialog,
-//   DialogTitle,
-//   DialogContent,
-//   DialogActions,
-//   Button,
-//   TextField,
-//   FormControl,
-//   MenuItem,
-//   Select,
-//   InputLabel,
-// } from "@mui/material";
-
 import "../DataTable/DataTable.css";
-import { Link } from "react-router-dom";
 
 export default function OrdersDataTable() {
+  const styles={
+    cancelButton: {
+      color: "black",
+      backgroundColor: "#ccc",
+      padding: "10px 20px",
+  
+    cursor: "pointer",
+    },
+    confirmButton: {
+      color: "white",
+      backgroundColor: "#0a5693",
+      padding: "10px 20px",
+  
+      cursor: "pointer",
+    },
+    titleEditStatus:{
+      textAlign:"center",
+      color:"white",
+      backgroundColor: "#0a5693",
+      fontSize :"1.24rem",
+      marginBottom: "10px",
+    }
+  }
   const orderColumns = [
     {
       field: "orderNumber",
@@ -34,9 +52,7 @@ export default function OrdersDataTable() {
       field: "customerName",
       headerName: "Customer Name",
       flex: 1,
-      renderCell: (params) => {
-        return <div className="cellWithImg">{params.row.customerName}</div>;
-      },
+
       headerClassName: "headerNameStyle",
     },
     {
@@ -45,7 +61,18 @@ export default function OrdersDataTable() {
       flex: 1,
       headerClassName: "headerNameStyle",
     },
-
+    {
+      field: "total_price",
+      headerName: "Total price",
+      flex: 1,
+      headerClassName: "headerNameStyle",
+    },
+    {
+      field: "order_items",
+      headerName: "Order items",
+      flex: 1,
+      headerClassName: "headerNameStyle",
+    },
     {
       field: "status",
       headerName: "Status",
@@ -68,8 +95,10 @@ export default function OrdersDataTable() {
         const formattedData = response.data.data.map((order) => ({
           orderNumber: order.orderNumber,
           customerName: order.customerFirstName + " " + order.customerLastName,
-          status: order.orderStatus || order.status,
-          date: order.orderDate || "", // Adjust if necessary
+          status: order.status,
+          date: order.orderDate,
+          total_price: order.cartTotalPrice,
+          order_items: order.order_items,
         }));
         setData(formattedData);
         console.log(formattedData);
@@ -82,40 +111,32 @@ export default function OrdersDataTable() {
   const getRowId = (row) => row.orderNumber;
 
   const [data, setData] = useState([]);
-
   const [openDialog, setOpenDialog] = useState(false);
-
-  /*const [editedOrder, setEditedOrder] = useState({
+  const [editedOrder, setEditedOrder] = useState({
     orderNumber: "",
     customerName: "",
     date: "",
     status: "",
-  });*/
+  });
 
-  // const handleDelete = (orderNumber) => {
-  //   setData(data.filter((item) => item.orderNumber !== orderNumber));
-  // };
-  // const handleEditClick = (params) => {
-  //   setEditedOrder({
-  //     orderNumber: params.row.orderNumber,
-  //     customerName: params.row.username,
-  //     date: params.row.date,
-  //     status: params.row.status,
-  //   });
-  //   setOpenDialog(true);
-  // };
+  const handleEditClick = (params) => {
+    setEditedOrder({
+      status: params.row.status,
+    });
+    setOpenDialog(true);
+  };
 
-  // const handleCloseDialog = () => {
-  //   setOpenDialog(false);
-  // };
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
 
-  /*const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setEditedOrder((prevUser) => ({
-      ...prevUser,
-      [name]: type === "checkbox" ? checked : value,
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditedOrder((prevOrder) => ({
+      ...prevOrder,
+      [name]: value,
     }));
-  };*/
+  };
 
   const handleFormSubmit = () => {
     setOpenDialog(false);
@@ -125,27 +146,17 @@ export default function OrdersDataTable() {
     {
       field: "action",
       headerName: "Action",
-    flex:1,
+      flex: 1,
       renderCell: (params) => {
         return (
           <div className="cellAction">
-            <div
-              className="detailsButton"
-              // onClick={() => handleEditClick(params)}
-            >
-              <VisibilityOutlinedIcon />
+            <div className="editButton" onClick={() => handleEditClick(params)}>
+              <EditOutlinedIcon />
             </div>
-
-            {/* <div
-              className="deleteButton"
-              onClick={() => handleDelete(params.row.orderNumber)}
-            >
-              <DeleteOutlineOutlinedIcon />
-            </div> */}
           </div>
         );
       },
-      headerClassName : "headerNameStyle"
+      headerClassName: "headerNameStyle",
     },
   ];
 
@@ -153,18 +164,15 @@ export default function OrdersDataTable() {
     <div className="datatable">
       <div className="datatableTitle">
         <span className="listUser">Orders</span>
-        <Link to="/orders/details" style={{ textDecoration: "none" }}>
-          <span className="link">Details</span>
-        </Link>
       </div>
       <DataGrid
-        // initialState={{
-        //   columns: {
-        //     columnVisibilityModel: {
-        //       orderNumber: false,
-        //     },
-        //   },
-        // }}
+        initialState={{
+          columns: {
+            columnVisibilityModel: {
+              orderNumber: false,
+            },
+          },
+        }}
         className="datagrid"
         rows={data}
         columns={orderColumns.concat(actionColumn)}
@@ -172,67 +180,30 @@ export default function OrdersDataTable() {
         pageSize={8}
         rowsPerPageOptions={[5]}
       />
-      {/* <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle
-          style={{
-            textAlign: "center",
-            backgroundColor: "#7451f8",
-            color: "#fff",
-          }}
-        >
-          Edit User
-        </DialogTitle>
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle style={styles.titleEditStatus} >Edit Status</DialogTitle>
         <DialogContent>
-          <TextField
-            label="Username"
-            name="username"
-            value={editedUser.username}
-            onChange={handleInputChange}
-            fullWidth
-            margin="normal"
-          />
-
-          <FormControl
-            fullWidth
-            margin="normal"
-            variant="outlined"
-            style={{ borderColor: "#7451f8" }}
-          >
-            <InputLabel id="active-label">Active</InputLabel>
+          <FormControl fullWidth>
+            <InputLabel>Status</InputLabel>
             <Select
-              labelId="active-label"
-              id="active"
-              name="active"
-              value={editedUser.active ? "yes" : "no"}
+              label="Status"
+              name="status"
+              value={editedOrder.status}
               onChange={handleInputChange}
-              label="Active"
             >
-              <MenuItem value="yes">Yes</MenuItem>
-              <MenuItem value="no">No</MenuItem>
+              <MenuItem value="open">Open</MenuItem>
+              <MenuItem value="Shipped">Shipped</MenuItem>
+              <MenuItem value="Paid">Paid</MenuItem>
+              <MenuItem value="Closed">Closed</MenuItem>
+              <MenuItem value="Canceled">Canceled</MenuItem>
             </Select>
           </FormControl>
-          <TextField
-            label="Email"
-            name="email"
-            value={editedUser.email}
-            onChange={handleInputChange}
-            fullWidth
-            margin="normal"
-          />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} style={{ color: "#7451f8" }}>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleFormSubmit}
-            style={{ backgroundColor: "#7451f8", color: "#fff" }}
-            variant="contained"
-          >
-            Save
-          </Button>
+          <Button onClick={handleCloseDialog} style={styles.cancelButton}>Cancel</Button>
+          <Button onClick={handleFormSubmit}  style={styles.confirmButton}>Save</Button>
         </DialogActions>
-        </Dialog> */}
+      </Dialog>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { RxDotFilled } from "react-icons/rx";
 import backgroundImage1 from "../../assets/slider/sliderBackground.webp";
 import backgroundImage2 from "../../assets/slider/sliderBackground2.webp";
 import backgroundImage3 from "../../assets/slider/sliderBackground3.webp";
+import { Link } from "react-router-dom";
 const Slideshow = () => {
   const slides = [
     {
@@ -16,9 +17,10 @@ const Slideshow = () => {
             Protection
           </h1>
           <p className="text-xl">Your home is safer than ever</p>
-          <button className="bg-white text-primary rounded-full px-6 py-3 hover:text-white hover:bg-secondary w-40 text-bold flex align-center justify-center self-center">
+          <Link className="bg-white text-primary rounded-full px-6 py-3 hover:text-white hover:bg-secondary w-40 text-bold flex align-center justify-center self-center"
+          to='/shop'>
             Shop now <IoIosArrowForward className="self-center pt-0.5" />
-          </button>
+          </Link>
         </div>
       ),
       animate: true, 
@@ -32,9 +34,10 @@ const Slideshow = () => {
             Smart Speakers
           </h1>
           <p className="text-xl">Google Home, Apple HomePod</p>
-          <button className="bg-white text-primary rounded-full px-6 py-3 hover:text-white hover:bg-secondary w-40 text-bold flex align-center justify-center self-center">
+          <Link className="bg-white text-primary rounded-full px-6 py-3 hover:text-white hover:bg-secondary w-40 text-bold flex align-center justify-center self-center"
+          to='/shop'>
             Shop now <IoIosArrowForward className="self-center pt-0.5" />
-          </button>
+          </Link>
         </div>
       ),
       animate: true, 
@@ -48,9 +51,10 @@ const Slideshow = () => {
             Air Purifer
           </h1>
           <p className="text-xl">Removes 99.97% Tiny Objects</p>
-          <button className="bg-white text-primary rounded-full px-6 py-3 hover:text-white hover:bg-secondary w-40 text-bold flex align-center justify-center self-center">
+          <Link className="bg-white text-primary rounded-full px-6 py-3 hover:text-white hover:bg-secondary w-40 text-bold flex align-center justify-center self-center"
+          to='/shop'>
             Shop now <IoIosArrowForward className="self-center pt-0.5" />
-          </button>
+          </Link>
         </div>
       ),
       animate: true, 
@@ -97,7 +101,7 @@ const Slideshow = () => {
     <div className="max-w-[1280px] h-[720px] w-full m-0 top-0 relative group">
       <div
         style={{ backgroundImage: `url(${currentSlide.url})` }}
-        className={`w-full h-full bg-center bg-cover duration-500`}
+        className={`w-screen h-full bg-center bg-cover duration-500`}
       >
         <div className="absolute sm:top-40 sm:left-56 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-center">
           <p className="text-lg">

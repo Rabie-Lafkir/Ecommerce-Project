@@ -15,9 +15,10 @@ import Widget from "../../components/Widget/Widget";
 import  PieChartComponent from '../../components/PieChartComponent/PieChartComponent';
 export default function Home() {
   //ajouter dans app
-  const accessTokenUser = localStorage.getItem('access');
+  const accessTokenUser = localStorage.getItem('access_token');
+ 
   const Navigate = useNavigate();
-  if (!accessTokenUser) {
+  if (!accessTokenUser ) {
     return <Navigate to="/login" />;
   }
 
@@ -34,7 +35,7 @@ export default function Home() {
  </div>
  <div className="charts">
         
-          <OrderChart title="Last 6 Months (Revenue)" aspect={2 / 1} />
+          <OrderChart  />
           
           <PieChartComponent />
         </div>

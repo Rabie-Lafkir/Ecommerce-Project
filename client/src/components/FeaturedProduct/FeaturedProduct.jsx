@@ -5,7 +5,6 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/free-mode";
 import { FreeMode, Pagination } from "swiper/modules";
-import cat from "../../assets/categories/cat.webp";
 import {
   Card,
   CardHeader,

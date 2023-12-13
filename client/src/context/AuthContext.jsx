@@ -7,6 +7,7 @@ export const authReducer = (state, action) => {
         case 'SIGNIN':
             localStorage.setItem('accessToken', action.payload.accessToken);
             localStorage.setItem('refreshToken', action.payload.refreshToken);
+            localStorage.setItem('customer', action.payload.customer?._id);
             return { customer: action.payload };
         case 'LOGOUT':
             localStorage.removeItem('accessToken');

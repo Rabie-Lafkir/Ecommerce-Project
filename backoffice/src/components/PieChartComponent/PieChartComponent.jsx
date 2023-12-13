@@ -1,16 +1,10 @@
-import React, { useCallback, useState } from "react";
-import { PieChart, Pie, Sector,Text  } from "recharts";
+import React, { useCallback, useState, useEffect } from "react";
+import { PieChart, Pie, Sector} from "recharts";
 import './PieChartComponent.css';
-const data = [
-  { name: "Product A", value: 400 },
-  { name: "Product B", value: 300 },
-  { name: "Product C", value: 100 },
-  { name: "Product D", value: 200 },
-  { name: "Product E", value: 250 },
- 
-];
+import axios from 'axios'
 
 const renderActiveShape = (props) => {
+
     const RADIAN = Math.PI / 180;
     const {
       cx,
@@ -68,7 +62,8 @@ const renderActiveShape = (props) => {
           x={ex + (cos >= 0 ? 1 : -1) * 12}
           y={ey}
           textAnchor={textAnchor}
-          fill="#333"
+          // fill="#7CD494"
+          fill="#97EEAE"
         >{` ${value} `}</text>
         {/* <text
           x={ex + (cos >= 0 ? 1 : -1) * 12}
@@ -84,31 +79,52 @@ const renderActiveShape = (props) => {
   };
 
 
-const PieChartComponent = () => {
+function PieChartComponent(){
   const [activeIndex, setActiveIndex] = useState(0);
+  
 
   const onPieEnter = useCallback((_, index) => {
     setActiveIndex(index);
   }, [setActiveIndex]);
-
+  const [topProducts, setTopProducts] = useState([]);
+  
+  useEffect(() => {
+    
+    const fetchTopProducts = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/v1/products/top5product"); 
+        setTopProducts(response.data);
+         console.log(response.data);
+      } catch (error) {
+        console.error("Error fetching top products:", error);
+      }
+    };
+  
+    fetchTopProducts();
+  }, []);
   return (
-    <PieChart width={400} height={400} className="piechartproduct">
-      <Text  x={200} y={50} textAnchor="middle" fontSize={20} fontWeight="bold" style={{ fill: '#000' }}>
-        HEELLOOOOOOO
-        </Text>
+    <div className="pie-chart-container">
+
+    <h2 className="titletopprod">TOP 5 PRODUCTS</h2>
+
+  
+    <PieChart width={400} height={400} >
       <Pie
         activeIndex={activeIndex}
         activeShape={renderActiveShape}
-        data={data}
+        data={topProducts}
         cx={200}
         cy={200}
         innerRadius={80}
         outerRadius={120}
-        fill="#8884d8"
+        fill="#97EEAE"
         dataKey="value"
         onMouseEnter={onPieEnter}
       />
+
+    
     </PieChart>
+  </div>
   );
 };
 

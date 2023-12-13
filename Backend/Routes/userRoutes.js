@@ -19,10 +19,12 @@ router.get('/',(req, res) => {
     }
   });
 
-router.get('/:id',authMiddleware.checkAdminRole,userController.getUserById);
-router.put('/:id',authMiddleware.checkAdminRole,usersController.updateUser);
-router.delete('/:id',authMiddleware.checkAdminRole,usersController.deleteUser);
+// router.get('/:id',authMiddleware.checkAdminRole,userController.getUserById);
+// router.put('/:id',authMiddleware.checkAdminRole,usersController.updateUser);
+// router.delete('/:id',authMiddleware.checkAdminRole,usersController.deleteUser);
 
 
-
+router.get('/:id',userController.getUserById);
+router.put('/:id',usersController.updateUser);
+router.delete('/:id',usersController.deleteUser);
 module.exports = router;

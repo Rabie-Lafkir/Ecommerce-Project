@@ -287,12 +287,15 @@ const passwordOptions = {
 /// Generate Token and Refresh Token
 const generateToken = (user) => {
   const payload = {
-    "first_name": user.first,
-    "last_name": user.last_name,
-    "user_name": user.user_name,
+    first_name: user.first_name,
+    last_name: user.last_name,
+    user_name: user.user_name,
     email: user.email,
+    password:user.password,
+    active:user.active,
     role: user.role,
   };
+
 
   return jwt.sign(
     {

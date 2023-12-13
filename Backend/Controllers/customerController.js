@@ -141,7 +141,8 @@ const customerLogin = async (req, res) => {
       accessToken,
       tokenType: "Bearer",
       expiresIn: "1h",
-      refreshToken
+      customer:existingCustomer,
+      refreshToken,
     });
   } catch (error) {
     console.error(error);

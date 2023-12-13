@@ -11,18 +11,18 @@ export const CartProvider = ({ children }) => {
   const [subtotal, setSubtotal] = useState(0);
   let cartQuantity = 0;
 
-  const addToCart = (product) => {
+  const addToCart = (product, amount) => {
     const existingProductIndex = cartItems.findIndex((item) => item._id === product._id);
 
     if (existingProductIndex !== -1) {
       const updatedCart = [...cartItems];
-      updatedCart[existingProductIndex].quantity += 1;
+      updatedCart[existingProductIndex].quantity += amount; // Update quantity by 'amount'
       setCartItems(updatedCart);
     } else {
-      setCartItems((prevItems) => [...prevItems, { ...product, quantity: 1 }]);
-    }
+      setCartItems((prevItems) => [...prevItems, { ...product, quantity: amount }]);
+    } 
+      cartQuantity += amount; 
 
-    cartQuantity += 1;
   };
 
   const removeFromCart = (itemId) => {

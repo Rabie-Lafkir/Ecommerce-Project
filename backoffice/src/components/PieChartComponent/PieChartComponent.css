@@ -1,5 +1,5 @@
 
-.piechartproduct{
+.pie-chart-container{
     flex: 2;
     -webkit-box-shadow: 2px 4px 10px 1px rgba(0, 0, 0, 0.47);
     box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
@@ -8,8 +8,8 @@
     background-color: white;
 }
 .titletopprod{
-    font-weight: bold;
-    font-size: 14px;
-    color: rgb(160, 160, 160);
-    background-color: white;
+    margin-bottom: 20px;
+  font-weight: bold;
+  font-size: 14px;
+  color: rgb(160, 160, 160);
 }
