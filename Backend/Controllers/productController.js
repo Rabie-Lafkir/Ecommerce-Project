@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const { Product } = require("../Models/product");
-const { Categories } = require("../Models/categorie");
+const  Categories  = require("../Models/categorie");
+
 const ObjectId = mongoose.Types.ObjectId;
 
 // Create a new product
@@ -70,6 +71,7 @@ const listProducts = async (req, res, next) => {
   }
 };
 
+
 // Search for a product
 const searchProducts = async (req, res) => {
   try {
@@ -80,7 +82,7 @@ const searchProducts = async (req, res) => {
     const products = await Product.aggregate([
       {
         $match: {
-          productName: { $regex: query, $options: "i" }, // Case-insensitive search
+          productName: { $regex: query, $options: "i" }, 
         },
       },
       {
@@ -90,7 +92,7 @@ const searchProducts = async (req, res) => {
           productImage: 1,
           productName: 1,
           categoryLink: 1,
-          category_name: "$category_name", // Modify this to match your schema structure
+          category_name: "$category_name", 
           shortDescription: 1,
           price: 1,
           quantity: 1,
@@ -166,7 +168,7 @@ const updateProduct = async (req, res) => {
     const product_image = req.file ? req.file.path : null;
 
     if (product_image) {
-      // Mettre à jour le champ product_image uniquement s'il y a une nouvelle image
+   
       updatedFields = { ...updatedFields, product_image };
     }
 
@@ -237,6 +239,46 @@ const getTotalProducts = async (req, res) => {
   }
 };
 
+//the top 5 products
+const getTopProducts = async (req, res) => {
+  try {
+    const topProducts = await Product.find().sort({ quantity: -1 }).limit(5);
+    const topProductsWithValues = topProducts.map(product => ({
+      name: product.product_name,
+      value: product.quantity, 
+    }));
+    res.json(topProductsWithValues);
+  } catch (error) {
+    console.error("Error fetching top product names:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+//prod per cat
+const getProductperCategory = async (req, res) => {
+  try {
+    const categories = await Categories.find({ active: true });
+    
+    const products = await Product.find({ active: true }).populate('categoryLink');
+
+    console.log("Products:", products);
+
+    const productCountByCategory = categories.map((category) => {
+      const productCount = products.filter(product => product.categoryLink._id.equals(category._id)).length;
+      //console.log(`Category: ${category.category_name}, Count: ${productCount}`);
+      return { category_name: category.category_name, productCount };
+    });
+
+   
+    console.log("Product Count by Category:", productCountByCategory);
+
+    res.json(productCountByCategory);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
 module.exports = {
   createProduct,
   listProducts,
@@ -245,4 +287,6 @@ module.exports = {
   searchProducts,
   getProductById,
   getTotalProducts,
+  getTopProducts,
+  getProductperCategory
 };
